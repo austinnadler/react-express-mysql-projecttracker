@@ -1,8 +1,13 @@
 import React from 'react';
 import './projects.css';
-import Table from 'react-bootstrap/Table';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
+// import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import { faInfoCircle, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TitleBar from '../titlebar/titlebar';
 import projects from '../../assets/data/projects';
@@ -13,6 +18,7 @@ class Projects extends React.Component {
         this.state = {
             projects: projects
         };
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount() {
@@ -23,36 +29,71 @@ class Projects extends React.Component {
         this.props.history.push(`/project/${id}`);
     }
 
+    handleDelete(e) {
+        e.stopPropagation();
+    }
+
+
     render() {
         return (
-            <div className="container">
+            <Container>
                 <TitleBar title="Projects" textColor="success" />
-                <Table bordered>
+                <Row>
+                    {
+                        this.state.projects.map((p) => {
+                            return (
+                                <Col md={4} className="p-1" onMouseDown={() => this.goTo(p.id)}>
+                                    <div className="inner shadow p-3">
+                                        <Row>
+                                            <Col xs={9}><h4>{p.name}</h4></Col>
+                                            <Col xs={3}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    delay={{ hide: 100 }}
+                                                    overlay={
+                                                        <Tooltip>
+                                                            Delete this project
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <Button size="sm" variant="danger" className="float-right" onMouseDown={this.handleDelete}><FontAwesomeIcon icon={faTrash} /></Button>
+                                                </OverlayTrigger>
+                                            </Col>
+                                        </Row>
+                                        <div>{p.description}</div>
+                                    </div>
+                                </Col>
+
+                            )
+                        })
+                    }
+                </Row>
+                {/* <Table bordered responsive>
                     <thead>
                         <tr>
+                            <th>View</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Area</th>
                             <th>Manager</th>
                             <th>State</th>
-                            <th></th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             this.state.projects.map((p) => {
                                 return (
-                                    <tr key={p.id}>   
+                                    <tr key={p.id}>
                                         <td>
-                                            <Button onClick={() => this.goTo(p.id)} size="sm"><FontAwesomeIcon icon={faInfoCircle}/></Button>
-                                            &nbsp;{p.name}
+                                            <Button onClick={() => this.goTo(p.id)} size="sm"><FontAwesomeIcon icon={faEye}/></Button>
                                         </td>
+                                        <td>{p.name}</td>
                                         <td>{p.description}</td>
                                         <td>{p.area}</td>
                                         <td>{p.manager}</td>
                                         <td>{p.state}</td>
-                                        <td className="text-center">
-                                            <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faEdit}/></Button>
+                                        <td>
                                             <Button variant="danger"><FontAwesomeIcon icon={faTrash}/></Button>
                                         </td>
                                     </tr>
@@ -60,8 +101,8 @@ class Projects extends React.Component {
                             })
                         }
                     </tbody>
-                </Table>
-            </div>
+                </Table> */}
+            </Container>
         )
     };
 }

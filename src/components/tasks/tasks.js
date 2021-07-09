@@ -1,8 +1,9 @@
 import React from 'react';
 import './tasks.css';
+import Container from 'react-bootstrap/Container';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import { faInfoCircle, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TitleBar from '../titlebar/titlebar';
 // import projects from '../../assets/data/projects';
@@ -23,16 +24,16 @@ class Projects extends React.Component {
     
     render() {
         return (
-            <div className="container">
+            <Container>
                 <TitleBar title="Tasks" textColor="success" />
-                <Table bordered hover>
+                <Table bordered responsive>
                     <thead>
                         <tr>
-                            <th>Project</th>
                             <th>Task</th>
                             <th>Description</th>
                             <th>State</th>
-                            <th></th>
+                            <th>Edit</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,7 +45,9 @@ class Projects extends React.Component {
                                         <td>{t.description}</td>
                                         <td>{t.state}</td>
                                         <td className="text-center">
-                                            <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faEdit}/></Button>
+                                            <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faPencilAlt}/></Button>
+                                        </td>
+                                        <td className="text-center">
                                             <Button variant="danger"><FontAwesomeIcon icon={faTrash}/></Button>
                                         </td>
                                     </tr>
@@ -53,7 +56,7 @@ class Projects extends React.Component {
                         }
                     </tbody>
                 </Table>
-            </div>
+            </Container>
         )
     };
 }
