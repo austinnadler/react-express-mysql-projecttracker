@@ -15,8 +15,8 @@ class Project extends React.Component {
     constructor(props) {
         super(props);
         const pid = this.props.match.params.pid;
-        var p = projects.find(p => p.id === parseInt(pid));
-        p.tasks = tasks.filter(t => t.projectId === parseInt(pid));
+        var p = projects.find(p => p.id === parseInt(pid)); // get the project
+        p.tasks = tasks.filter(t => t.projectId === parseInt(pid)); // get tasks associated with the project
         this.state = {
             project: p
         };

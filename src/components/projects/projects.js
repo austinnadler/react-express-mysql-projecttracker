@@ -32,13 +32,16 @@ class Projects extends React.Component {
         document.title = "Projects";
     }
 
-    goTo(id) {
+    goTo(id, e) {
+        if(e.button === 2) return; // dont do anything on right click
         this.props.history.push(`/project/${id}`);
     }
 
     handleDeleteConfirm(p, e) {
-        this.setState({ projectToDelete: p });
-        this.setState({ showModal: true });
+        this.setState({ 
+            projectToDelete: p,
+            showModal: true
+        });
         e.stopPropagation();
     }
 
@@ -77,7 +80,7 @@ class Projects extends React.Component {
                     {
                         this.state.projects.map((p) => {
                             return (
-                                <Col md={4} className="p-1" onMouseDown={() => this.goTo(p.id)}>
+                                <Col md={4} className="p-1" onMouseDown={(e) => this.goTo(p.id, e)}>
                                     <div className="inner shadow p-3">
                                         <Row>
                                             <Col xs={9}>
@@ -96,7 +99,9 @@ class Projects extends React.Component {
                                                     <Button size="sm" variant="danger" className="float-right" onMouseDown={(e) => this.handleDeleteConfirm(p, e)}><FontAwesomeIcon icon={faTrash} /></Button>
                                                 </OverlayTrigger>
                                             </Col>
-                                            <Col xs={12} className="text-muted">{p.tasks.length} tasks</Col>
+                                            <Col xs={12}>
+                                                <small className={"text-muted " + (p.tasks.length === 0 ? "d-none" : "")}>{p.tasks.length} tasks</small>
+                                            </Col>
                                         </Row>
                                         <div>{p.description}</div>
                                     </div>
