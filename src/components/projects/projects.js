@@ -5,20 +5,27 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
-// import Table from 'react-bootstrap/Table';
+import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import TitleBar from '../titlebar/titlebar';
 import projects from '../../assets/data/projects';
+import tasks from '../../assets/data/tasks';
 
 class Projects extends React.Component {
     constructor(props) {
         super(props);
+        projects.forEach(p => {
+            p.tasks = tasks.filter(t => t.projectId === p.id);
+        });
+        let _projects = projects.sort((a, b) => { return a.id - b.id }); // sort ascending
         this.state = {
-            projects: projects
+            projects: _projects,
+            showModal: false,
+            projectToDelete: {}
         };
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     componentDidMount() {
@@ -29,15 +36,43 @@ class Projects extends React.Component {
         this.props.history.push(`/project/${id}`);
     }
 
-    handleDelete(e) {
+    handleDeleteConfirm(p, e) {
+        this.setState({ projectToDelete: p });
+        this.setState({ showModal: true });
         e.stopPropagation();
     }
 
+    handleDelete(pid) {
+        let _projects = this.state.projects.filter(p => p.id !== pid)
+        this.setState({ projects: _projects,
+                        showModal: false
+        });
+    }
+
+    handleCancel() {
+        this.setState({ showModal: false });
+    }
 
     render() {
         return (
             <Container>
-                <TitleBar title="Projects" textColor="success" />
+                <Modal show={this.state.showModal} onHide={this.handleCancel}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete {this.state.projectToDelete.name}?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Are you sure you want to delete {this.state.projectToDelete.name}?<br/>Doing so will also delete all of its tasks.</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="danger" onClick={() => this.handleDelete(this.state.projectToDelete.id)}>
+                            Delete
+                        </Button>
+                        <Button variant="secondary" onClick={this.handleCancel}>
+                            Cancel
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <Col xs={12} className="mt-3 mb-3 text-center">
+                    <h1 className="text-success">Projects</h1>
+                </Col>
                 <Row>
                     {
                         this.state.projects.map((p) => {
@@ -45,7 +80,9 @@ class Projects extends React.Component {
                                 <Col md={4} className="p-1" onMouseDown={() => this.goTo(p.id)}>
                                     <div className="inner shadow p-3">
                                         <Row>
-                                            <Col xs={9}><h4>{p.name}</h4></Col>
+                                            <Col xs={9}>
+                                                <h4 className="d-inline-block mb-0">{p.name}</h4>
+                                            </Col>
                                             <Col xs={3}>
                                                 <OverlayTrigger
                                                     placement="top"
@@ -56,9 +93,10 @@ class Projects extends React.Component {
                                                         </Tooltip>
                                                     }
                                                 >
-                                                    <Button size="sm" variant="danger" className="float-right" onMouseDown={this.handleDelete}><FontAwesomeIcon icon={faTrash} /></Button>
+                                                    <Button size="sm" variant="danger" className="float-right" onMouseDown={(e) => this.handleDeleteConfirm(p, e)}><FontAwesomeIcon icon={faTrash} /></Button>
                                                 </OverlayTrigger>
                                             </Col>
+                                            <Col xs={12} className="text-muted">{p.tasks.length} tasks</Col>
                                         </Row>
                                         <div>{p.description}</div>
                                     </div>
@@ -68,40 +106,6 @@ class Projects extends React.Component {
                         })
                     }
                 </Row>
-                {/* <Table bordered responsive>
-                    <thead>
-                        <tr>
-                            <th>View</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Area</th>
-                            <th>Manager</th>
-                            <th>State</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            this.state.projects.map((p) => {
-                                return (
-                                    <tr key={p.id}>
-                                        <td>
-                                            <Button onClick={() => this.goTo(p.id)} size="sm"><FontAwesomeIcon icon={faEye}/></Button>
-                                        </td>
-                                        <td>{p.name}</td>
-                                        <td>{p.description}</td>
-                                        <td>{p.area}</td>
-                                        <td>{p.manager}</td>
-                                        <td>{p.state}</td>
-                                        <td>
-                                            <Button variant="danger"><FontAwesomeIcon icon={faTrash}/></Button>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        }
-                    </tbody>
-                </Table> */}
             </Container>
         )
     };

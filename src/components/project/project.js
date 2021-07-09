@@ -1,5 +1,4 @@
 import React from 'react';
-import './project.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -32,7 +31,7 @@ class Project extends React.Component {
         // this is where the select call to the server will go
         document.title = this.state.project.name;
         var table;
-        if (this.state.project.tasks.length == 0) {
+        if (this.state.project.tasks.length === 0) {
             table = <h4 className="text-center">{this.state.project.name} has no tasks.</h4>
         } else {
             table = <Table bordered responsive>

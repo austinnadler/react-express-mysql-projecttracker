@@ -1,18 +1,17 @@
 import React from 'react';
-import './tasks.css';
 import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import TitleBar from '../titlebar/titlebar';
 // import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
 
 class Projects extends React.Component {
     constructor(props) {
         super(props);
-        var _tasks = tasks;
+        var _tasks = tasks.sort((a, b) => { return a.projectId - b.projectId }); // sort ascending
         this.state = {
             tasks: _tasks
         };
@@ -21,11 +20,13 @@ class Projects extends React.Component {
     componentDidMount() {
         document.title = "Tasks";
     }
-    
+
     render() {
         return (
             <Container>
-                <TitleBar title="Tasks" textColor="success" />
+                <Col xs={12} className="mt-3 mb-3 text-center">
+                    <h1 className="text-success">Tasks</h1>
+                </Col>
                 <Table bordered responsive>
                     <thead>
                         <tr>
@@ -45,10 +46,10 @@ class Projects extends React.Component {
                                         <td>{t.description}</td>
                                         <td>{t.state}</td>
                                         <td className="text-center">
-                                            <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faPencilAlt}/></Button>
+                                            <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faPencilAlt} /></Button>
                                         </td>
                                         <td className="text-center">
-                                            <Button variant="danger"><FontAwesomeIcon icon={faTrash}/></Button>
+                                            <Button variant="danger"><FontAwesomeIcon icon={faTrash} /></Button>
                                         </td>
                                     </tr>
                                 );

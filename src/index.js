@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 // Components
 import NavBar from './components/navbar/navbar';
-import Footer from './components/footer/footer';
+// import Footer from './components/footer/footer';
 import Projects from './components/projects/projects';
 import Project from './components/project/project';
 import Tasks from './components/tasks/tasks';
@@ -21,7 +21,7 @@ ReactDOM.render(
                 <Route path="/tasks" component={Tasks} />
             </Switch>
         </Router>
-        <Footer />
+        {/* <Footer /> */}
     </React.StrictMode>,
   document.getElementById('root')
 );
