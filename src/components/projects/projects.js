@@ -92,7 +92,9 @@ class Projects extends React.Component {
             this.setState({
                 newProjectId: project.id,
                 newProjectName: project.name,
-                newProjectDescription: project.description
+                newProjectDescription: project.description,
+                nameCharsRemaining: maxLength - project.name.length,
+                descriptionCharsRemaining: maxLength - project.description.length,
             });
         }
     }
@@ -175,7 +177,7 @@ class Projects extends React.Component {
                 <Col xs={12} className="mt-3 mb-3 text-center">
                     <h1 className="text-success">Projects</h1>
                     <Col xs={12} md={{ span: 4, offset: 4 }} className="mt-3 text-center">
-                        <Button onClick={this.showNewProjectModal}><FontAwesomeIcon icon={faPlusSquare} /> New Project</Button>
+                        <Button onClick={(e) => this.showNewProjectModal(null, e)}><FontAwesomeIcon icon={faPlusSquare} /> New Project</Button>
                     </Col>
                 </Col>
                 <Row>
