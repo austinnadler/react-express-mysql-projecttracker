@@ -3,8 +3,8 @@ import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
 
@@ -40,8 +40,8 @@ class Projects extends React.Component {
                             <th>Project</th>
                             <th>Task</th>
                             <th>Description</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            {/* <th>Edit</th>
+                            <th>Delete</th> */}
                         </tr>
                     </thead>
                     <tbody>
@@ -52,12 +52,12 @@ class Projects extends React.Component {
                                         <td>{t.project.name}</td>
                                         <td>{t.name}</td>
                                         <td>{t.description}</td>
-                                        <td className="text-center">
+                                        {/* <td className="text-center">
                                             <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faPencilAlt} /></Button>
                                         </td>
                                         <td className="text-center">
                                             <Button variant="danger"><FontAwesomeIcon icon={faTrash} /></Button>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 );
                             })

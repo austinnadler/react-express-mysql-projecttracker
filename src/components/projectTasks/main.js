@@ -6,7 +6,7 @@ import TaskTable from './taskTable';
 import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
 
-class Project extends React.Component {
+class ProjectTasks extends React.Component {
     constructor(props) {
         super(props);
         const pid = this.props.match.params.pid;
@@ -32,4 +32,4 @@ class Project extends React.Component {
         )
     };
 }
-export default Project;
+export default ProjectTasks;

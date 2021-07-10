@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import NavBar from './components/navbar/navbar';
 // import Footer from './components/footer/footer';
 import Projects from './components/projects/projects';
-import Project from './components/project/main';
+import ProjectTasks from './components/projectTasks/main';
 import Tasks from './components/tasks/tasks';
 
 ReactDOM.render(
@@ -17,8 +17,8 @@ ReactDOM.render(
             <Switch>
                 <Route exact path="/" component={Projects} />
                 <Route path="/projects" component={Projects} />
-                <Route path="/project/:pid" component={Project} />
-                <Route path="/tasks" component={Tasks} />
+                <Route exact path="/tasks" component={Tasks} />
+                <Route path="/tasks/:pid" component={ProjectTasks} />
             </Switch>
         </Router>
         {/* <Footer /> */}

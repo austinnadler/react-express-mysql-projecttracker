@@ -118,11 +118,11 @@ class ProjectTable extends React.Component {
     }
 
     render() {
-        let modalTitle;
+        let taskModalTitle;
         if(this.state.editingTask) {
-            modalTitle = `Editing task ${this.state.editingTask.name}`;
+            taskModalTitle = <Modal.Title>Editing task <i>{this.state.editingTask.name}</i></Modal.Title>
         } else {
-            modalTitle = `New task for ${this.state.project.name}`;
+            taskModalTitle = <Modal.Title>New task for <i>{this.state.project.name}</i></Modal.Title>
         }
 
         var table;
@@ -186,7 +186,7 @@ class ProjectTable extends React.Component {
                     <Button onClick={() => this.showTaskModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
                     <Modal show={this.state.showTaskModal}>
                         <Modal.Header>
-                            <Modal.Title>{modalTitle}</Modal.Title>
+                            {taskModalTitle}
                         </Modal.Header>
                         <Modal.Body>
                             <Form.Group>

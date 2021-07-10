@@ -18,8 +18,8 @@ class ProjectInfo extends React.Component {
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         }
-        this.showProjectEditForm = this.showProjectEditForm.bind(this);
-        this.hideProjectEditForm = this.hideProjectEditForm.bind(this);
+        this.showProjectEditModal = this.showProjectEditModal.bind(this);
+        this.hideProjectEditModal = this.hideProjectEditModal.bind(this);
         this.handleProjectSubmit = this.handleProjectSubmit.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
@@ -29,7 +29,7 @@ class ProjectInfo extends React.Component {
         document.title = this.state.project.name;
     }
 
-    showProjectEditForm() {
+    showProjectEditModal() {
         this.setState({
             _project: { ...this.state.project }, // _project is used in the change methods of the fields in the modal
             nameCharsRemaining: maxLength - this.state.project.name.length,
@@ -38,7 +38,7 @@ class ProjectInfo extends React.Component {
         this.setState({ editProject: true });
     }
 
-    hideProjectEditForm() {
+    hideProjectEditModal() {
         this.setState({ editProject: false });
     }
 
@@ -82,7 +82,7 @@ class ProjectInfo extends React.Component {
                 <Col xs={12} md={{ span: 6, offset: 3 }} className="mt-2 mb-2">
                     <Modal show={this.state.editProject}>
                         <Modal.Header>
-                            Edit {this.state.project.name}
+                            <Modal.Title>Edit <i>{this.state.project.name}</i></Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <Form.Group>
@@ -98,14 +98,14 @@ class ProjectInfo extends React.Component {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button className="mb-2 mr-2" variant="primary" onClick={this.handleProjectSubmit}>Submit</Button>
-                            <Button className="mb-2" variant="secondary" onClick={this.hideProjectEditForm}>Cancel</Button>
+                            <Button className="mb-2" variant="secondary" onClick={this.hideProjectEditModal}>Cancel</Button>
                         </Modal.Footer>
                     </Modal>
                 </Col>
                 <Col xs={12}>
                     <h1 className="m-4 text-success text-center">
                         {this.state.project.name}
-                        <Button className="ml-1" onClick={this.showProjectEditForm}><FontAwesomeIcon icon={faPencilAlt} /></Button>
+                        <Button className="ml-1" onClick={this.showProjectEditModal}><FontAwesomeIcon icon={faPencilAlt} /></Button>
                     </h1>
                 </Col>
                 <Col xs={12} md={{ span: 6, offset: 3 }} className="col-6 col-offset-3">

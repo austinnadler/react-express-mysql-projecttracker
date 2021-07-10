@@ -26,6 +26,7 @@ class Projects extends React.Component {
             projects: _projects,
             showDeleteModal: false,
             projectToDelete: {},
+            editingProject: null,
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         }
@@ -44,15 +45,15 @@ class Projects extends React.Component {
 
     goTo(id, e) {
         if (e.button === 2) return; // dont do anything on right click
-        this.props.history.push(`/project/${id}`);
+        this.props.history.push(`/tasks/${id}`);
     }
 
     handleDeleteConfirm(p, e) {
+        e.stopPropagation();
         this.setState({
             projectToDelete: p,
             showDeleteModal: true
         });
-        e.stopPropagation();
     }
 
     handleDelete(pid) {
@@ -90,6 +91,7 @@ class Projects extends React.Component {
         }
         if (project) {
             this.setState({
+                editingProject: project,
                 newProjectId: project.id,
                 newProjectName: project.name,
                 newProjectDescription: project.description,
@@ -102,6 +104,8 @@ class Projects extends React.Component {
     hideProjectModal() {
         this.setState({
             showProjectModal: false,
+            editingProject: null,
+            newProjectId: null,
             newProjectName: null,
             newProjectDescription: null,
             nameCharsRemaining: maxLength,
@@ -133,6 +137,8 @@ class Projects extends React.Component {
         this.setState({
             projects: _projects,
             showProjectModal: false,
+            editingProject: null,
+            newProjectId: null,
             newProjectName: null,
             newProjectDescription: null,
             nameCharsRemaining: maxLength,
@@ -141,6 +147,12 @@ class Projects extends React.Component {
     }
 
     render() {
+        var projectModalTitle;
+        if(this.state.editingProject) {
+            projectModalTitle = <Modal.Title>Editing project&nbsp;<i>{this.state.editingProject.name}</i></Modal.Title>
+        } else {
+            projectModalTitle = <Modal.Title>New project</Modal.Title>;
+        }
         return (
             <Container>
                 <Modal show={this.state.showDeleteModal}>
@@ -159,7 +171,7 @@ class Projects extends React.Component {
                 </Modal>
                 <Modal show={this.state.showProjectModal}>
                     <Modal.Header>
-                        New project
+                        {projectModalTitle}
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Group>
