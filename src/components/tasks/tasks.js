@@ -2,7 +2,7 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 // import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import projects from '../../assets/data/projects';
