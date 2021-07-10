@@ -5,13 +5,20 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import projects from '../../assets/data/projects';
+import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
 
 class Projects extends React.Component {
     constructor(props) {
         super(props);
         var _tasks = tasks.sort((a, b) => { return a.projectId - b.projectId }); // sort ascending
+        _tasks.forEach(t => {
+            projects.forEach(p => {
+                if(t.projectId === p.id) {
+                    t.project = p;
+                }
+            });
+        });
         this.state = {
             tasks: _tasks
         };
@@ -30,6 +37,7 @@ class Projects extends React.Component {
                 <Table striped responsive>
                     <thead>
                         <tr>
+                            <th>Project</th>
                             <th>Task</th>
                             <th>Description</th>
                             <th>Edit</th>
@@ -41,6 +49,7 @@ class Projects extends React.Component {
                             this.state.tasks.map((t) => {
                                 return (
                                     <tr key={t.id}>
+                                        <td>{t.project.name}</td>
                                         <td>{t.name}</td>
                                         <td>{t.description}</td>
                                         <td className="text-center">
