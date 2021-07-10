@@ -47,8 +47,9 @@ class Projects extends React.Component {
 
     handleDelete(pid) {
         let _projects = this.state.projects.filter(p => p.id !== pid)
-        this.setState({ projects: _projects,
-                        showModal: false
+        this.setState({ 
+            projects: _projects,
+            showModal: false
         });
     }
 
