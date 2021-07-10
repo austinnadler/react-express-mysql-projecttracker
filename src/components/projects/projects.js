@@ -15,6 +15,8 @@ import tasks from '../../assets/data/tasks';
 
 const maxLength = 200;
 
+// Don't allow blank names or descriptions
+
 class Projects extends React.Component {
     constructor(props) {
         super(props);
@@ -33,8 +35,8 @@ class Projects extends React.Component {
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleDeleteCancel = this.handleDeleteCancel.bind(this);
-        this.showNewProjectModal = this.showNewProjectModal.bind(this);
-        this.hideNewProjectModal = this.hideNewProjectModal.bind(this);
+        this.showProjectModal = this.showProjectModal.bind(this);
+        this.hideProjectModal = this.hideProjectModal.bind(this);
         this.handleProjectSubmit = this.handleProjectSubmit.bind(this);
     }
 
@@ -83,12 +85,12 @@ class Projects extends React.Component {
         });
     }
 
-    showNewProjectModal(project, e) {
-        this.setState({ showNewProjectModal: true });
-        if(e) {
+    showProjectModal(project, e) {
+        this.setState({ showProjectModal: true });
+        if (e) {
             e.stopPropagation();
         }
-        if(project) {
+        if (project) {
             this.setState({
                 newProjectId: project.id,
                 newProjectName: project.name,
@@ -99,9 +101,9 @@ class Projects extends React.Component {
         }
     }
 
-    hideNewProjectModal() {
+    hideProjectModal() {
         this.setState({
-            showNewProjectModal: false,
+            showProjectModal: false,
             newProjectName: null,
             newProjectDescription: null,
             nameCharsRemaining: maxLength,
@@ -111,9 +113,9 @@ class Projects extends React.Component {
 
     handleProjectSubmit() {
         let _projects = [...this.state.projects];
-        if(this.state.newProjectId) {
+        if (this.state.newProjectId) {
             _projects.forEach(p => {
-                if(p.id === this.state.newProjectId) {
+                if (p.id === this.state.newProjectId) {
                     p.name = this.state.newProjectName;
                     p.description = this.state.newProjectDescription;
                 }
@@ -128,7 +130,7 @@ class Projects extends React.Component {
         }
         this.setState({
             projects: _projects,
-            showNewProjectModal: false,
+            showProjectModal: false,
             newProjectName: null,
             newProjectDescription: null,
             nameCharsRemaining: maxLength,
@@ -153,7 +155,7 @@ class Projects extends React.Component {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-                <Modal show={this.state.showNewProjectModal}>
+                <Modal show={this.state.showProjectModal}>
                     <Modal.Header>
                         New project
                     </Modal.Header>
@@ -171,13 +173,13 @@ class Projects extends React.Component {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button className="mb-2 mr-2" variant="primary" onClick={this.handleProjectSubmit}>Submit</Button>
-                        <Button className="mb-2" variant="secondary" onClick={this.hideNewProjectModal}>Cancel</Button>
+                        <Button className="mb-2" variant="secondary" onClick={this.hideProjectModal}>Cancel</Button>
                     </Modal.Footer>
                 </Modal>
                 <Col xs={12} className="mt-3 mb-3 text-center">
                     <h1 className="text-success">Projects</h1>
                     <Col xs={12} md={{ span: 4, offset: 4 }} className="mt-3 text-center">
-                        <Button onClick={(e) => this.showNewProjectModal(null, e)}><FontAwesomeIcon icon={faPlusSquare} /> New Project</Button>
+                        <Button onClick={(e) => this.showProjectModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Project</Button>
                     </Col>
                 </Col>
                 <Row>
@@ -191,16 +193,14 @@ class Projects extends React.Component {
                                                 <h4 className="d-inline-block mb-0">{p.name}</h4>
                                             </Col>
                                             <Col xs={1}>
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    delay={{ hide: 100 }}
+                                                <OverlayTrigger placement="top" delay={{ hide: 100 }}
                                                     overlay={
                                                         <Tooltip>
                                                             Edit this project
                                                         </Tooltip>
                                                     }
                                                 >
-                                                    <Button size="sm" variant="primary" className="float-right" onMouseDown={(e) => this.showNewProjectModal(p, e)}><FontAwesomeIcon icon={faEdit} /></Button>
+                                                    <Button size="sm" variant="primary" className="float-right" onMouseDown={(e) => this.showProjectModal(p, e)}><FontAwesomeIcon icon={faEdit} /></Button>
                                                 </OverlayTrigger>
                                             </Col>
                                             <Col xs={1}>

@@ -1,25 +1,33 @@
 import React from "react";
-import TaskForm from "./taskForm";
 import Col from "react-bootstrap/Col";
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import Table from 'react-bootstrap/Table';
-import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import { faTrash, faPlusSquare, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import tasks from '../../assets/data/tasks';
+
+const maxLength = 200;
 
 class ProjectTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            project: props.project
+            project: props.project,
+            showTaskModal: false,
+            nameCharsRemaining: maxLength,
+            descriptionCharsRemaining: maxLength,
+            editingTask: {}
         }
-        this.renderMe = this.renderMe.bind(this);
-    }
-
-    // this method is passed to taskForm to trigger an update when a task is submitted. won't be needed when on server, just refresh the page instead
-    renderMe() {
-        this.forceUpdate();
+        // this.renderMe = this.renderMe.bind(this);
+        this.showTaskModal = this.showTaskModal.bind(this);
+        this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
+        this.handleNewTaskNameChange = this.handleNewTaskNameChange.bind(this);
+        this.handleNewTaskDescriptionChange = this.handleNewTaskDescriptionChange.bind(this);
+        this.hideTaskModal = this.hideTaskModal.bind(this);
     }
 
     handleDelete(tid) {
@@ -28,7 +36,91 @@ class ProjectTable extends React.Component {
         this.setState({ project: _project });
     }
 
+    showTaskModal(task, e) {
+        this.setState({ showTaskModal: true });
+        if (e) {
+            e.stopPropagation();
+        }
+        if (task) {
+            this.setState({
+                newTaskId: task.id,
+                newTaskName: task.name,
+                newTaskDescription: task.description,
+                nameCharsRemaining: maxLength - task.name.length,
+                descriptionCharsRemaining: maxLength - task.description.length,
+            });
+        }
+    }
+
+    hideTaskModal() {
+        this.setState({
+            showTaskModal: false,
+            newTaskName: null,
+            newTaskDescription: null,
+            nameCharsRemaining: maxLength,
+            descriptionCharsRemaining: maxLength
+        });
+    }
+
+    handleNewTaskNameChange(e) {
+        this.setState({
+            newTaskName: e.target.value,
+            nameCharsRemaining: maxLength - e.target.value.length
+        });
+    }
+
+    handleNewTaskDescriptionChange(e) {
+        this.setState({
+            newTaskDescription: e.target.value,
+            descriptionCharsRemaining: maxLength - e.target.value.length
+        });
+    }
+
+    handleTaskSubmit() {
+        // this is where insert task call to server will go
+        if (!this.state.newTaskName || !this.state.newTaskDescription) {
+            alert("All fields are required");
+            return;
+        }
+        if(this.state.newTaskId) {
+            let _tasks = [...tasks];
+            _tasks.forEach(t => {
+                if(t.id === this.state.newTaskId) {
+                    t.name = this.state.newTaskName;
+                    t.description = this.state.newTaskDescription;
+                }
+            });
+        } else {
+            let task = {
+                id: tasks[tasks.length - 1].id + 1,
+                projectId: this.state.project.id,
+                name: this.state.newTaskName,
+                description: this.state.newTaskDescription
+            }
+            // alert(task.id + " " + task.projectId + " " + task.name + " " + task.description);
+            let _project = { ...this.state.project };
+            _project.tasks.push(task);
+            this.setState({
+                project: _project
+            });
+        }
+        this.setState({
+            showTaskModal: false,
+            newTaskName: "",
+            newTaskDescription: "",
+            nameCharsRemaining: maxLength,
+            descriptionCharsRemaining: maxLength
+        });
+    }
+
     render() {
+        let modalTitle;
+        if (this.state.newTask) {
+            modalTitle = `New task for ${this.state.project.name}`;
+        } else {
+            // modalTitle = `Editing task ${this.props.editingTask.name}`;
+        }
+
         var table;
         if (this.state.project.tasks.length === 0) {
             table = <h4 className="text-center">{this.state.project.name} has no tasks.</h4>
@@ -51,7 +143,17 @@ class ProjectTable extends React.Component {
                                         <td>{t.name}</td>
                                         <td>{t.description}</td>
                                         <td className="text-center">
-                                            <Button variant="success"><FontAwesomeIcon icon={faPencilAlt} /></Button>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                delay={{ hide: 100 }}
+                                                overlay={
+                                                    <Tooltip>
+                                                        Delete this task
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <Button variant="primary" onClick={(e) => this.showTaskModal(t, e)}><FontAwesomeIcon icon={faEdit} /></Button>
+                                            </OverlayTrigger>
                                         </td>
                                         <td className="text-center">
                                             <OverlayTrigger
@@ -75,7 +177,35 @@ class ProjectTable extends React.Component {
         }
         return (
             <Col xs={12}>
-                <TaskForm project={this.state.project} new={true} renderParent={this.renderMe}/>
+                {/* <TaskForm project={this.state.project} new={true} renderParent={this.renderMe}/> */}
+                <Col xs={12} md={{ span: 4, offset: 4 }} className="mb-3 text-center">
+                    <Button onClick={() => this.showTaskModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
+                    <Modal show={this.state.showTaskModal}>
+                        <Modal.Header>
+                            <Modal.Title>{modalTitle}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form.Group>
+                                <Form.Label>Task name</Form.Label>
+                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTaskName} onChange={this.handleNewTaskNameChange}></Form.Control>
+                                <small className="text-muted">{this.state.nameCharsRemaining} characters remaining</small>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Description</Form.Label>
+                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTaskDescription} onChange={this.handleNewTaskDescriptionChange} />
+                                <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={this.handleTaskSubmit}>
+                                Submit
+                            </Button>
+                            <Button variant="secondary" onClick={this.hideTaskModal}>
+                                Cancel
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </Col>
                 {table}
             </Col>
         )
