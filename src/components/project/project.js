@@ -6,7 +6,8 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
-import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import Modal from 'react-bootstrap/Modal';
+import { faPencilAlt, faTrash, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
@@ -16,15 +17,21 @@ class Project extends React.Component {
         super(props);
         const pid = this.props.match.params.pid;
         var p = projects.find(p => p.id === parseInt(pid)); // get the project
-        p.tasks = tasks.filter(t => t.projectId === parseInt(pid)); // get tasks associated with the project
+        p.tasks = tasks.filter(t => t.projectId === parseInt(pid)).sort((a, b) => { return a.id - b.id }); // get tasks associated with the project
         this.state = {
-            project: p
+            project: p,
+            showTaskForm: false
         };
         // methods that are called without () must be bound
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleProjectSubmit = this.handleProjectSubmit.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.closeAlert = this.closeAlert.bind(this);
+        this.showTaskForm = this.showTaskForm.bind(this);
+        this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
+        this.handleNewTaskNameChange = this.handleNewTaskNameChange.bind(this);
+        this.handleNewTaskDescriptionChange = this.handleNewTaskDescriptionChange.bind(this);
+        this.handleTaskCancel = this.handleTaskCancel.bind(this);
     }
 
     componentDidMount() {
@@ -34,36 +41,37 @@ class Project extends React.Component {
         if (this.state.project.tasks.length === 0) {
             table = <h4 className="text-center">{this.state.project.name} has no tasks.</h4>
         } else {
-            table = <Table bordered responsive>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>State</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        this.state.project.tasks.map((t) => {
-                            return (
-                                <tr key={t.id}>
-                                    <td>{t.name}</td>
-                                    <td>{t.description}</td>
-                                    <td>{t.state}</td>
-                                    <td className="text-center">
-                                        <Button variant="success"><FontAwesomeIcon icon={faPencilAlt} /></Button>
-                                    </td>
-                                    <td className="text-center">
-                                        <Button variant="danger"><FontAwesomeIcon icon={faTrash} /></Button>
-                                    </td>
-                                </tr>
-                            );
-                        })
-                    }
-                </tbody>
-            </Table>
+            table =
+                <Table bordered responsive>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>State</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.state.project.tasks.map((t) => {
+                                return (
+                                    <tr key={t.id}>
+                                        <td>{t.name}</td>
+                                        <td>{t.description}</td>
+                                        <td>{t.state}</td>
+                                        <td className="text-center">
+                                            <Button variant="success"><FontAwesomeIcon icon={faPencilAlt} /></Button>
+                                        </td>
+                                        <td className="text-center">
+                                            <Button variant="danger"><FontAwesomeIcon icon={faTrash} /></Button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        }
+                    </tbody>
+                </Table>
         }
         this.setState({ table: table });
     }
@@ -79,7 +87,7 @@ class Project extends React.Component {
                 project: this.state._project
             });
         }
-        this.setState({ edit: toggleTo });
+        this.setState({ editProject: toggleTo });
     }
 
     handleNameChange(e) {
@@ -94,11 +102,11 @@ class Project extends React.Component {
         this.setState({ project: _project });
     }
 
-    handleSubmit(e) {
+    handleProjectSubmit(e) {
         // This is where the update call to server will go
         e.preventDefault();
         this.setState({
-            edit: false,
+            editProject: false,
             showAlert: true
         });
         document.title = this.state.project.name;
@@ -108,6 +116,38 @@ class Project extends React.Component {
         this.setState({
             showAlert: false
         });
+    }
+
+    showTaskForm() {
+        this.setState({ showTaskForm: true });
+    }
+
+    handleNewTaskNameChange(e) {
+        this.setState({ newTaskName: e.target.value });
+    }
+
+    handleNewTaskDescriptionChange(e) {
+        this.setState({ newTaskDescription: e.target.value });
+    }
+
+    handleTaskSubmit() {
+        // this is where insert task call to server will go
+        let task = {
+            id: tasks[tasks.length - 1].id + 1,
+            projectId: this.state.project.id,
+            name: this.state.newTaskName,
+            description: this.state.newTaskDescription
+        }
+        let _project = this.state.project;
+        _project.tasks.push(task);
+        this.setState({
+            project: _project,
+            showTaskForm: false 
+        });
+    }
+
+    handleTaskCancel() {
+        this.setState({ showTaskForm: false });
     }
 
     render() {
@@ -122,11 +162,12 @@ class Project extends React.Component {
                 <div>{this.state.project.description}</div>
             </Alert>;
         }
+
         var topSection;
-        if (this.state.edit) {
-            topSection = (
+        if (this.state.editProject) {
+            topSection =
                 <Col xs={12} md={{ span: 6, offset: 3 }} className="mt-2 mb-2">
-                    <Form onSubmit={this.handleSubmit} >
+                    <Form onSubmit={this.handleProjectSubmit} >
                         <Form.Group>
                             <Form.Label>Project name</Form.Label>
                             <Form.Control type="text" maxLength="200" value={this.state.project.name} onChange={this.handleNameChange}></Form.Control>
@@ -139,9 +180,8 @@ class Project extends React.Component {
                         <Button className="mb-2" variant="danger" onClick={() => this.toggleEdit(false)}>Cancel</Button>
                     </Form>
                 </Col>
-            )
         } else {
-            topSection = (
+            topSection =
                 <Col xs={12}>
                     <Col xs={12}>
                         <h1 className="m-4 text-success text-center">
@@ -153,17 +193,43 @@ class Project extends React.Component {
                         <p><b>Description:</b> {this.state.project.description}</p>
                     </Col>
                 </Col>
-            )
         }
+
         return (
             <Container>
                 <Row>
                     {alert}
                     {topSection}
+                    <Col xs={12} md={{ span: 2, offset: 5 }} className="mb-3 text-center">
+                        <Button onClick={this.showTaskForm}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
+                    </Col>
                     <Col xs={12}>
                         {this.state.table}
                     </Col>
                 </Row>
+                <Modal show={this.state.showTaskForm}>
+                    <Modal.Header>
+                        <Modal.Title>New task for {this.state.project.name}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group>
+                            <Form.Label>Task name</Form.Label>
+                            <Form.Control type="text" maxLength="200" value={this.state.newTaskName} onChange={this.handleNewTaskNameChange}></Form.Control>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control as="textarea" maxLength="200" rows={3} value={this.state.newTaskDescription} onChange={this.handleNewTaskDescriptionChange} />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={this.handleTaskSubmit}>
+                            Submit
+                        </Button>
+                        <Button variant="secondary" onClick={this.handleTaskCancel}>
+                            Cancel
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </Container >
         )
     };
