@@ -27,12 +27,11 @@ class Projects extends React.Component {
                 <Col xs={12} className="mt-3 mb-3 text-center">
                     <h1 className="text-success">Tasks</h1>
                 </Col>
-                <Table bordered responsive>
+                <Table striped responsive>
                     <thead>
                         <tr>
                             <th>Task</th>
                             <th>Description</th>
-                            <th>State</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
@@ -44,7 +43,6 @@ class Projects extends React.Component {
                                     <tr key={t.id}>
                                         <td>{t.name}</td>
                                         <td>{t.description}</td>
-                                        <td>{t.state}</td>
                                         <td className="text-center">
                                             <Button variant="success" className="mr-1"><FontAwesomeIcon icon={faPencilAlt} /></Button>
                                         </td>

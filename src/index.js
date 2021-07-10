@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import NavBar from './components/navbar/navbar';
 // import Footer from './components/footer/footer';
 import Projects from './components/projects/projects';
-import Project from './components/project/project';
+import Project from './components/project/main';
 import Tasks from './components/tasks/tasks';
 
 ReactDOM.render(
