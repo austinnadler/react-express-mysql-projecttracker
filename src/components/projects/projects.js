@@ -23,7 +23,7 @@ class Projects extends React.Component {
             projects: _projects,
             showModal: false,
             projectToDelete: {}
-        };
+        }
         this.handleDelete = this.handleDelete.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
     }
@@ -60,8 +60,8 @@ class Projects extends React.Component {
     render() {
         return (
             <Container>
-                <Modal show={this.state.showModal} onHide={this.handleCancel}>
-                    <Modal.Header closeButton>
+                <Modal show={this.state.showModal}>
+                    <Modal.Header>
                         <Modal.Title>Delete {this.state.projectToDelete.name}?</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>Are you sure you want to delete {this.state.projectToDelete.name}?<br/>Doing so will also delete all of its tasks.</Modal.Body>
