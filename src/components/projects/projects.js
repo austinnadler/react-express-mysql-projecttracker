@@ -114,7 +114,7 @@ class Projects extends React.Component {
     }
 
     handleProjectSubmit() {
-        if (!this.state.newProjectName || !this.state.newProjectName) {
+        if (!this.state.newProjectName || !this.state.newProjectDescription) {
             alert("All fields are required");
             return;
         }
