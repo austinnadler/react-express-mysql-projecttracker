@@ -23,7 +23,6 @@ class ProjectTable extends React.Component {
             editingTask: false,
             newTask: {}
         }
-        // this.renderMe = this.renderMe.bind(this);
         this.showTaskModal = this.showTaskModal.bind(this);
         this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -43,6 +42,7 @@ class ProjectTable extends React.Component {
         if (task) {
             this.setState({
                 editingTask: true,
+                taskNameBeforeEdit: task.name,
                 newTask: task,
                 nameCharsRemaining: maxLength - task.name.length,
                 descriptionCharsRemaining: maxLength - task.description.length,
@@ -54,6 +54,7 @@ class ProjectTable extends React.Component {
         this.setState({
             showTaskModal: false,
             editingTask: false,
+            taskNameBeforeEdit: null,
             newTask: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
@@ -114,7 +115,7 @@ class ProjectTable extends React.Component {
     render() {
         let taskModalTitle;
         if (this.state.editingTask) {
-            taskModalTitle = <Modal.Title>Editing task <i>{this.state.newTask.name}</i></Modal.Title>
+            taskModalTitle = <Modal.Title>Editing task <i>{this.state.taskNameBeforeEdit}</i></Modal.Title>
         } else {
             taskModalTitle = <Modal.Title>New task for <i>{this.props.project.name}</i></Modal.Title>
         }
@@ -175,7 +176,6 @@ class ProjectTable extends React.Component {
         }
         return (
             <Col xs={12}>
-                {/* <TaskForm project={this.props.project} new={true} renderParent={this.renderMe}/> */}
                 <Col xs={12} md={{ span: 4, offset: 4 }} className="mb-3 text-center">
                     <Button onClick={() => this.showTaskModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
                     <Modal show={this.state.showTaskModal}>

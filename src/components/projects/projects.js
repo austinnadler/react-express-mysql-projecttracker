@@ -68,24 +68,26 @@ class Projects extends React.Component {
     handleDeleteCancel() {
         this.setState({ showDeleteModal: false });
     }
-    
+
     showProjectModal(project, e) {
         if (e) { e.stopPropagation(); }
         this.setState({ showProjectModal: true });
         if (project) {
             this.setState({
                 editingProject: true,
+                projectNameBeforeEdit: project.name,
                 newProject: project,
                 nameCharsRemaining: maxLength - project.name.length,
                 descriptionCharsRemaining: maxLength - project.description.length,
             });
         }
     }
-    
+
     hideProjectModal() {
         this.setState({
             showProjectModal: false,
             editingProject: false,
+            projectNameBeforeEdit: null,
             newProject: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
@@ -93,7 +95,7 @@ class Projects extends React.Component {
     }
 
     handleNameChange(e) {
-        let newProject = {...this.state.newProject};
+        let newProject = { ...this.state.newProject };
         newProject.name = e.target.value;
         this.setState({
             newProject: newProject,
@@ -102,7 +104,7 @@ class Projects extends React.Component {
     }
 
     handleDescriptionChange(e) {
-        let newProject = {...this.state.newProject};
+        let newProject = { ...this.state.newProject };
         newProject.description = e.target.value;
         this.setState({
             newProject: newProject,
@@ -143,8 +145,8 @@ class Projects extends React.Component {
 
     render() {
         var projectModalTitle;
-        if(this.state.editingProject) {
-            projectModalTitle = <Modal.Title>Editing project&nbsp;<i>{this.state.newProject.name}</i></Modal.Title>
+        if (this.state.editingProject) {
+            projectModalTitle = <Modal.Title>Editing project&nbsp;<i>{this.state.projectNameBeforeEdit}</i></Modal.Title>
         } else {
             projectModalTitle = <Modal.Title>New project</Modal.Title>;
         }
@@ -203,25 +205,12 @@ class Projects extends React.Component {
                                             </Col>
                                             <Col xs={1}>
                                                 <OverlayTrigger placement="top" delay={{ hide: 100 }}
-                                                    overlay={
-                                                        <Tooltip>
-                                                            Edit this project
-                                                        </Tooltip>
-                                                    }
-                                                >
+                                                    overlay={<Tooltip>Edit this project</Tooltip>}>
                                                     <Button size="sm" variant="primary" className="float-right" onMouseDown={(e) => this.showProjectModal(p, e)}><FontAwesomeIcon icon={faEdit} /></Button>
                                                 </OverlayTrigger>
                                             </Col>
                                             <Col xs={1}>
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    delay={{ hide: 100 }}
-                                                    overlay={
-                                                        <Tooltip>
-                                                            Delete this project
-                                                        </Tooltip>
-                                                    }
-                                                >
+                                                <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Delete this project</Tooltip>}>
                                                     <Button size="sm" variant="danger" className="float-right" onMouseDown={(e) => this.handleDeleteConfirm(p, e)}><FontAwesomeIcon icon={faTrash} /></Button>
                                                 </OverlayTrigger>
                                             </Col>
