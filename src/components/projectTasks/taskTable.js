@@ -16,39 +16,34 @@ class ProjectTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            project: this.props.project, // project is refreshed when a delete or edit happens
+            tasks: tasks,
             showTaskModal: false,
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength,
-            editingTask: null
+            editingTask: false,
+            newTask: {}
         }
         // this.renderMe = this.renderMe.bind(this);
         this.showTaskModal = this.showTaskModal.bind(this);
         this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
-        this.handleNewTaskNameChange = this.handleNewTaskNameChange.bind(this);
-        this.handleNewTaskDescriptionChange = this.handleNewTaskDescriptionChange.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.hideTaskModal = this.hideTaskModal.bind(this);
     }
 
     handleDelete(tid) {
-        var _project = { ...this.state.project };
-        _project.tasks = _project.tasks.filter(t => t.id !== tid);
-        this.setState({ project: _project });
+        var _tasks = [...this.state.tasks];
+        _tasks = this.state.tasks.filter(t => t.id !== tid);
+        this.setState({ tasks: _tasks });
     }
 
     showTaskModal(task, e) {
-        this.setState({
-            showTaskModal: true,
-            editingTask: task
-        });
-        if (e) {
-            e.stopPropagation();
-        }
+        if (e) { e.stopPropagation(); }
+        this.setState({ showTaskModal: true });
         if (task) {
             this.setState({
-                newTaskId: task.id,
-                newTaskName: task.name,
-                newTaskDescription: task.description,
+                editingTask: true,
+                newTask: task,
                 nameCharsRemaining: maxLength - task.name.length,
                 descriptionCharsRemaining: maxLength - task.description.length,
             });
@@ -58,76 +53,75 @@ class ProjectTable extends React.Component {
     hideTaskModal() {
         this.setState({
             showTaskModal: false,
-            editingTask: null,
-            newTaskName: null,
-            newTaskDescription: null,
+            editingTask: false,
+            newTask: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
     }
 
-    handleNewTaskNameChange(e) {
+    handleNameChange(e) {
+        let newTask = { ...this.state.newTask };
+        newTask.name = e.target.value;
         this.setState({
-            newTaskName: e.target.value,
+            newTask: newTask,
             nameCharsRemaining: maxLength - e.target.value.length
         });
     }
 
-    handleNewTaskDescriptionChange(e) {
+    handleDescriptionChange(e) {
+        let newTask = { ...this.state.newTask };
+        newTask.description = e.target.value;;
         this.setState({
-            newTaskDescription: e.target.value,
+            newTask: newTask,
             descriptionCharsRemaining: maxLength - e.target.value.length
         });
     }
 
     handleTaskSubmit() {
         // this is where insert task call to server will go
-        if (!this.state.newTaskName || !this.state.newTaskDescription) {
+        if (!this.state.newTask.name || !this.state.newTask.description) {
             alert("All fields are required");
             return;
         }
-        if(this.state.newTaskId) {
-            let _tasks = [...tasks];
+        let _tasks = [...this.state.tasks];
+        if (this.state.editingTask) {
             _tasks.forEach(t => {
-                if(t.id === this.state.newTaskId) {
-                    t.name = this.state.newTaskName;
-                    t.description = this.state.newTaskDescription;
+                if (t.id === this.state.newTask.id) {
+                    t.name = this.state.newTask.name;
+                    t.description = this.state.newTask.description;
                 }
             });
         } else {
-            let task = {
-                id: tasks[tasks.length - 1].id + 1,
-                projectId: this.state.project.id,
-                name: this.state.newTaskName,
-                description: this.state.newTaskDescription
-            }
-            // alert(task.id + " " + task.projectId + " " + task.name + " " + task.description);
-            let _project = { ...this.state.project };
-            _project.tasks.push(task);
-            this.setState({
-                project: _project
+            _tasks.push({
+                id: this.state.tasks[this.state.tasks.length - 1].id + 1,
+                projectId: this.props.project.id,
+                name: this.state.newTask.name,
+                description: this.state.newTask.description
             });
         }
         this.setState({
+            tasks: _tasks,
             showTaskModal: false,
-            newTaskName: "",
-            newTaskDescription: "",
+            editingTask: false,
+            newTask: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
+        console.log(this.state.tasks.length);
     }
 
     render() {
         let taskModalTitle;
-        if(this.state.editingTask) {
-            taskModalTitle = <Modal.Title>Editing task <i>{this.state.editingTask.name}</i></Modal.Title>
+        if (this.state.editingTask) {
+            taskModalTitle = <Modal.Title>Editing task <i>{this.state.newTask.name}</i></Modal.Title>
         } else {
-            taskModalTitle = <Modal.Title>New task for <i>{this.state.project.name}</i></Modal.Title>
+            taskModalTitle = <Modal.Title>New task for <i>{this.props.project.name}</i></Modal.Title>
         }
 
         var table;
-        if (this.state.project.tasks.length === 0) {
-            table = <h4 className="text-center">{this.state.project.name} has no tasks.</h4>
+        if (this.props.project.tasks.length === 0) {
+            table = <h4 className="text-center">{this.props.project.name} has no tasks.</h4>
         } else {
             table =
                 <Table striped responsive>
@@ -141,7 +135,7 @@ class ProjectTable extends React.Component {
                     </thead>
                     <tbody>
                         {
-                            this.state.project.tasks.map((t) => {
+                            this.state.tasks.filter(t => t.projectId === this.props.project.id).map((t) => {
                                 return (
                                     <tr key={t.id}>
                                         <td>{t.name}</td>
@@ -181,7 +175,7 @@ class ProjectTable extends React.Component {
         }
         return (
             <Col xs={12}>
-                {/* <TaskForm project={this.state.project} new={true} renderParent={this.renderMe}/> */}
+                {/* <TaskForm project={this.props.project} new={true} renderParent={this.renderMe}/> */}
                 <Col xs={12} md={{ span: 4, offset: 4 }} className="mb-3 text-center">
                     <Button onClick={() => this.showTaskModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
                     <Modal show={this.state.showTaskModal}>
@@ -191,12 +185,12 @@ class ProjectTable extends React.Component {
                         <Modal.Body>
                             <Form.Group>
                                 <Form.Label>Task name</Form.Label>
-                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTaskName} onChange={this.handleNewTaskNameChange}></Form.Control>
+                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTask.name} onChange={this.handleNameChange}></Form.Control>
                                 <small className="text-muted">{this.state.nameCharsRemaining} characters remaining</small>
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Description</Form.Label>
-                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTaskDescription} onChange={this.handleNewTaskDescriptionChange} />
+                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTask.description} onChange={this.handleDescriptionChange} />
                                 <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
                             </Form.Group>
                         </Modal.Body>

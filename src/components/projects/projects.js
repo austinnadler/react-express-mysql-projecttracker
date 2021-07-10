@@ -25,8 +25,9 @@ class Projects extends React.Component {
         this.state = {
             projects: _projects,
             showDeleteModal: false,
-            projectToDelete: {},
-            editingProject: null,
+            projectToDelete: {}, // Alert is always rendered, so give this an empty object instead of null to prevent errors
+            newProject: {},
+            editingProject: false,
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         }
@@ -67,80 +68,74 @@ class Projects extends React.Component {
     handleDeleteCancel() {
         this.setState({ showDeleteModal: false });
     }
-
-    handleNameChange(e) {
-        let name = e.target.value;
-        this.setState({
-            newProjectName: name,
-            nameCharsRemaining: maxLength - name.length
-        });
-    }
-
-    handleDescriptionChange(e) {
-        let description = e.target.value;
-        this.setState({
-            newProjectDescription: description,
-            descriptionCharsRemaining: maxLength - description.length
-        });
-    }
-
+    
     showProjectModal(project, e) {
+        if (e) { e.stopPropagation(); }
         this.setState({ showProjectModal: true });
-        if (e) {
-            e.stopPropagation();
-        }
         if (project) {
             this.setState({
-                editingProject: project,
-                newProjectId: project.id,
-                newProjectName: project.name,
-                newProjectDescription: project.description,
+                editingProject: true,
+                newProject: project,
                 nameCharsRemaining: maxLength - project.name.length,
                 descriptionCharsRemaining: maxLength - project.description.length,
             });
         }
     }
-
+    
     hideProjectModal() {
         this.setState({
             showProjectModal: false,
-            editingProject: null,
-            newProjectId: null,
-            newProjectName: null,
-            newProjectDescription: null,
+            editingProject: false,
+            newProject: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
     }
 
+    handleNameChange(e) {
+        let newProject = {...this.state.newProject};
+        newProject.name = e.target.value;
+        this.setState({
+            newProject: newProject,
+            nameCharsRemaining: maxLength - e.target.value.length
+        });
+    }
+
+    handleDescriptionChange(e) {
+        let newProject = {...this.state.newProject};
+        newProject.description = e.target.value;
+        this.setState({
+            newProject: newProject,
+            descriptionCharsRemaining: maxLength - e.target.value.length
+        });
+    }
+
     handleProjectSubmit() {
-        if (!this.state.newProjectName || !this.state.newProjectDescription) {
+        if (!this.state.newProject.name || !this.state.newProject.description) {
             alert("All fields are required");
             return;
         }
         let _projects = [...this.state.projects];
-        if (this.state.newProjectId) {
+        if (this.state.editingProject) {
             _projects.forEach(p => {
-                if (p.id === this.state.newProjectId) {
-                    p.name = this.state.newProjectName;
-                    p.description = this.state.newProjectDescription;
+                if (p.id === this.state.newProject.id) {
+                    p.name = this.state.newProject.name;
+                    p.description = this.state.newProject.description;
                 }
             });
         } else {
             _projects.push({
                 id: this.state.projects[this.state.projects.length - 1].id + 1,
-                name: this.state.newProjectName,
-                description: this.state.newProjectDescription,
+                name: this.state.newProject.name,
+                description: this.state.newProject.description,
                 tasks: []
             });
         }
         this.setState({
             projects: _projects,
             showProjectModal: false,
-            editingProject: null,
-            newProjectId: null,
-            newProjectName: null,
-            newProjectDescription: null,
+            editingProject: false,
+            newProject: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
@@ -149,7 +144,7 @@ class Projects extends React.Component {
     render() {
         var projectModalTitle;
         if(this.state.editingProject) {
-            projectModalTitle = <Modal.Title>Editing project&nbsp;<i>{this.state.editingProject.name}</i></Modal.Title>
+            projectModalTitle = <Modal.Title>Editing project&nbsp;<i>{this.state.newProject.name}</i></Modal.Title>
         } else {
             projectModalTitle = <Modal.Title>New project</Modal.Title>;
         }
@@ -176,12 +171,12 @@ class Projects extends React.Component {
                     <Modal.Body>
                         <Form.Group>
                             <Form.Label>Project name</Form.Label>
-                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProjectName} onChange={this.handleNameChange}></Form.Control>
+                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProject.name} onChange={this.handleNameChange}></Form.Control>
                             <small className="text-muted">{this.state.nameCharsRemaining} characters remaining</small>
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Description</Form.Label>
-                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProjectDescription} onChange={this.handleDescriptionChange} />
+                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProject.description} onChange={this.handleDescriptionChange} />
                             <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
                         </Form.Group>
                     </Modal.Body>
@@ -200,7 +195,7 @@ class Projects extends React.Component {
                     {
                         this.state.projects.map((p) => {
                             return (
-                                <Col md={4} className="p-1" onMouseDown={(e) => this.goTo(p.id, e)}>
+                                <Col key={p.id} md={4} className="p-1" onMouseDown={(e) => this.goTo(p.id, e)}>
                                     <div className="inner shadow p-3">
                                         <Row>
                                             <Col xs={10}>
