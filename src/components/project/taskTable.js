@@ -18,7 +18,7 @@ class ProjectTable extends React.Component {
     }
 
     // this method is passed to taskForm to trigger an update when a task is submitted
-    renderMe(p) {
+    renderMe() {
         this.forceUpdate();
     }
 
