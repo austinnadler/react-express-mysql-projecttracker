@@ -15,8 +15,6 @@ import tasks from '../../assets/data/tasks';
 
 const maxLength = 200;
 
-// Don't allow blank names or descriptions
-
 class Projects extends React.Component {
     constructor(props) {
         super(props);

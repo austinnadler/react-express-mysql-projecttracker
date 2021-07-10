@@ -16,6 +16,7 @@ class ProjectTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            project: this.props.project, // project is refreshed when a delete or edit happens
             showTaskModal: false,
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength,
@@ -30,7 +31,7 @@ class ProjectTable extends React.Component {
     }
 
     handleDelete(tid) {
-        var _project = { ...this.props.project };
+        var _project = { ...this.state.project };
         _project.tasks = _project.tasks.filter(t => t.id !== tid);
         this.setState({ project: _project });
     }
@@ -96,12 +97,12 @@ class ProjectTable extends React.Component {
         } else {
             let task = {
                 id: tasks[tasks.length - 1].id + 1,
-                projectId: this.props.project.id,
+                projectId: this.state.project.id,
                 name: this.state.newTaskName,
                 description: this.state.newTaskDescription
             }
             // alert(task.id + " " + task.projectId + " " + task.name + " " + task.description);
-            let _project = { ...this.props.project };
+            let _project = { ...this.state.project };
             _project.tasks.push(task);
             this.setState({
                 project: _project
@@ -121,12 +122,12 @@ class ProjectTable extends React.Component {
         if(this.state.editingTask) {
             modalTitle = `Editing task ${this.state.editingTask.name}`;
         } else {
-            modalTitle = `New task for ${this.props.project.name}`;
+            modalTitle = `New task for ${this.state.project.name}`;
         }
 
         var table;
-        if (this.props.project.tasks.length === 0) {
-            table = <h4 className="text-center">{this.props.project.name} has no tasks.</h4>
+        if (this.state.project.tasks.length === 0) {
+            table = <h4 className="text-center">{this.state.project.name} has no tasks.</h4>
         } else {
             table =
                 <Table striped responsive>
@@ -140,7 +141,7 @@ class ProjectTable extends React.Component {
                     </thead>
                     <tbody>
                         {
-                            this.props.project.tasks.map((t) => {
+                            this.state.project.tasks.map((t) => {
                                 return (
                                     <tr key={t.id}>
                                         <td>{t.name}</td>
@@ -151,7 +152,7 @@ class ProjectTable extends React.Component {
                                                 delay={{ hide: 100 }}
                                                 overlay={
                                                     <Tooltip>
-                                                        Delete this task
+                                                        Edit this task
                                                     </Tooltip>
                                                 }
                                             >
@@ -180,7 +181,7 @@ class ProjectTable extends React.Component {
         }
         return (
             <Col xs={12}>
-                {/* <TaskForm project={this.props.project} new={true} renderParent={this.renderMe}/> */}
+                {/* <TaskForm project={this.state.project} new={true} renderParent={this.renderMe}/> */}
                 <Col xs={12} md={{ span: 4, offset: 4 }} className="mb-3 text-center">
                     <Button onClick={() => this.showTaskModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
                     <Modal show={this.state.showTaskModal}>
