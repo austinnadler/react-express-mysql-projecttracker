@@ -91,7 +91,7 @@ class TaskForm extends React.Component {
         }
         
         return (
-            <Col xs={12} md={{ span: 2, offset: 5 }} className="mb-3 text-center">
+            <Col xs={12} md={{ span: 4, offset: 4 }} className="mb-3 text-center">
                 <Button onClick={this.showTaskForm}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
                 <Modal show={this.state.showTaskForm}>
                     <Modal.Header>

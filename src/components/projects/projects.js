@@ -8,7 +8,7 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { faTrash, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPlusSquare, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
@@ -83,8 +83,18 @@ class Projects extends React.Component {
         });
     }
 
-    showNewProjectModal() {
+    showNewProjectModal(project, e) {
         this.setState({ showNewProjectModal: true });
+        if(e) {
+            e.stopPropagation();
+        }
+        if(project) {
+            this.setState({
+                newProjectId: project.id,
+                newProjectName: project.name,
+                newProjectDescription: project.description
+            });
+        }
     }
 
     hideNewProjectModal() {
@@ -99,12 +109,21 @@ class Projects extends React.Component {
 
     handleProjectSubmit() {
         let _projects = [...this.state.projects];
-        _projects.push({
-            id: this.state.projects[this.state.projects.length - 1].id + 1,
-            name: this.state.newProjectName,
-            description: this.state.newProjectDescription,
-            tasks: []
-        });
+        if(this.state.newProjectId) {
+            _projects.forEach(p => {
+                if(p.id === this.state.newProjectId) {
+                    p.name = this.state.newProjectName;
+                    p.description = this.state.newProjectDescription;
+                }
+            });
+        } else {
+            _projects.push({
+                id: this.state.projects[this.state.projects.length - 1].id + 1,
+                name: this.state.newProjectName,
+                description: this.state.newProjectDescription,
+                tasks: []
+            });
+        }
         this.setState({
             projects: _projects,
             showNewProjectModal: false,
@@ -155,8 +174,8 @@ class Projects extends React.Component {
                 </Modal>
                 <Col xs={12} className="mt-3 mb-3 text-center">
                     <h1 className="text-success">Projects</h1>
-                    <Col xs={12} md={{ span: 2, offset: 5 }} className="mt-3 text-center">
-                        <Button onClick={this.showNewProjectModal}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
+                    <Col xs={12} md={{ span: 4, offset: 4 }} className="mt-3 text-center">
+                        <Button onClick={this.showNewProjectModal}><FontAwesomeIcon icon={faPlusSquare} /> New Project</Button>
                     </Col>
                 </Col>
                 <Row>
@@ -166,10 +185,23 @@ class Projects extends React.Component {
                                 <Col md={4} className="p-1" onMouseDown={(e) => this.goTo(p.id, e)}>
                                     <div className="inner shadow p-3">
                                         <Row>
-                                            <Col xs={9}>
+                                            <Col xs={10}>
                                                 <h4 className="d-inline-block mb-0">{p.name}</h4>
                                             </Col>
-                                            <Col xs={3}>
+                                            <Col xs={1}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    delay={{ hide: 100 }}
+                                                    overlay={
+                                                        <Tooltip>
+                                                            Edit this project
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <Button size="sm" variant="primary" className="float-right" onMouseDown={(e) => this.showNewProjectModal(p, e)}><FontAwesomeIcon icon={faEdit} /></Button>
+                                                </OverlayTrigger>
+                                            </Col>
+                                            <Col xs={1}>
                                                 <OverlayTrigger
                                                     placement="top"
                                                     delay={{ hide: 100 }}
@@ -189,13 +221,12 @@ class Projects extends React.Component {
                                         <div>{p.description}</div>
                                     </div>
                                 </Col>
-
                             )
                         })
                     }
                 </Row>
             </Container>
         )
-    };
+    }
 }
 export default Projects;
