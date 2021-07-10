@@ -112,6 +112,10 @@ class Projects extends React.Component {
     }
 
     handleProjectSubmit() {
+        if (!this.state.newProjectName || !this.state.newProjectName) {
+            alert("All fields are required");
+            return;
+        }
         let _projects = [...this.state.projects];
         if (this.state.newProjectId) {
             _projects.forEach(p => {
