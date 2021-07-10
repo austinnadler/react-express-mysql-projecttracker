@@ -97,8 +97,8 @@ class ProjectInfo extends React.Component {
                             </Form.Group>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button className="mb-2 mr-2" variant="success" onClick={this.handleProjectSubmit}>Submit</Button>
-                            <Button className="mb-2" variant="danger" onClick={this.hideProjectEditForm}>Cancel</Button>
+                            <Button className="mb-2 mr-2" variant="primary" onClick={this.handleProjectSubmit}>Submit</Button>
+                            <Button className="mb-2" variant="secondary" onClick={this.hideProjectEditForm}>Cancel</Button>
                         </Modal.Footer>
                     </Modal>
                 </Col>

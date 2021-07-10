@@ -6,11 +6,14 @@ import Col from 'react-bootstrap/Col';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import projects from '../../assets/data/projects';
 import tasks from '../../assets/data/tasks';
+
+const maxLength = 200;
 
 class Projects extends React.Component {
     constructor(props) {
@@ -21,11 +24,18 @@ class Projects extends React.Component {
         let _projects = projects.sort((a, b) => { return a.id - b.id }); // sort ascending
         this.state = {
             projects: _projects,
-            showModal: false,
-            projectToDelete: {}
+            showDeleteModal: false,
+            projectToDelete: {},
+            nameCharsRemaining: maxLength,
+            descriptionCharsRemaining: maxLength
         }
         this.handleDelete = this.handleDelete.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.handleDeleteCancel = this.handleDeleteCancel.bind(this);
+        this.showNewProjectModal = this.showNewProjectModal.bind(this);
+        this.hideNewProjectModal = this.hideNewProjectModal.bind(this);
+        this.handleProjectSubmit = this.handleProjectSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -33,49 +43,121 @@ class Projects extends React.Component {
     }
 
     goTo(id, e) {
-        if(e.button === 2) return; // dont do anything on right click
+        if (e.button === 2) return; // dont do anything on right click
         this.props.history.push(`/project/${id}`);
     }
 
     handleDeleteConfirm(p, e) {
-        this.setState({ 
+        this.setState({
             projectToDelete: p,
-            showModal: true
+            showDeleteModal: true
         });
         e.stopPropagation();
     }
 
     handleDelete(pid) {
         let _projects = this.state.projects.filter(p => p.id !== pid)
-        this.setState({ 
+        this.setState({
             projects: _projects,
-            showModal: false
+            showDeleteModal: false
         });
     }
 
-    handleCancel() {
-        this.setState({ showModal: false });
+    handleDeleteCancel() {
+        this.setState({ showDeleteModal: false });
+    }
+
+    handleNameChange(e) {
+        let name = e.target.value;
+        this.setState({
+            newProjectName: name,
+            nameCharsRemaining: maxLength - name.length
+        });
+    }
+
+    handleDescriptionChange(e) {
+        let description = e.target.value;
+        this.setState({
+            newProjectDescription: description,
+            descriptionCharsRemaining: maxLength - description.length
+        });
+    }
+
+    showNewProjectModal() {
+        this.setState({ showNewProjectModal: true });
+    }
+
+    hideNewProjectModal() {
+        this.setState({
+            showNewProjectModal: false,
+            newProjectName: null,
+            newProjectDescription: null,
+            nameCharsRemaining: maxLength,
+            descriptionCharsRemaining: maxLength
+        });
+    }
+
+    handleProjectSubmit() {
+        let _projects = [...this.state.projects];
+        _projects.push({
+            id: this.state.projects[this.state.projects.length - 1].id + 1,
+            name: this.state.newProjectName,
+            description: this.state.newProjectDescription,
+            tasks: []
+        });
+        this.setState({
+            projects: _projects,
+            showNewProjectModal: false,
+            newProjectName: null,
+            newProjectDescription: null,
+            nameCharsRemaining: maxLength,
+            descriptionCharsRemaining: maxLength
+        });
     }
 
     render() {
         return (
             <Container>
-                <Modal show={this.state.showModal}>
+                <Modal show={this.state.showDeleteModal}>
                     <Modal.Header>
                         <Modal.Title>Delete {this.state.projectToDelete.name}?</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Are you sure you want to delete {this.state.projectToDelete.name}?<br/>Doing so will also delete all of its tasks.</Modal.Body>
+                    <Modal.Body>Are you sure you want to delete {this.state.projectToDelete.name}?<br />Doing so will also delete all of its tasks.</Modal.Body>
                     <Modal.Footer>
                         <Button variant="danger" onClick={() => this.handleDelete(this.state.projectToDelete.id)}>
                             Delete
                         </Button>
-                        <Button variant="secondary" onClick={this.handleCancel}>
+                        <Button variant="secondary" onClick={this.handleDeleteCancel}>
                             Cancel
                         </Button>
                     </Modal.Footer>
                 </Modal>
+                <Modal show={this.state.showNewProjectModal}>
+                    <Modal.Header>
+                        New project
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group>
+                            <Form.Label>Project name</Form.Label>
+                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProjectName} onChange={this.handleNameChange}></Form.Control>
+                            <small className="text-muted">{this.state.nameCharsRemaining} characters remaining</small>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProjectDescription} onChange={this.handleDescriptionChange} />
+                            <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button className="mb-2 mr-2" variant="primary" onClick={this.handleProjectSubmit}>Submit</Button>
+                        <Button className="mb-2" variant="secondary" onClick={this.hideNewProjectModal}>Cancel</Button>
+                    </Modal.Footer>
+                </Modal>
                 <Col xs={12} className="mt-3 mb-3 text-center">
                     <h1 className="text-success">Projects</h1>
+                    <Col xs={12} md={{ span: 2, offset: 5 }} className="mt-3 text-center">
+                        <Button onClick={this.showNewProjectModal}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
+                    </Col>
                 </Col>
                 <Row>
                     {

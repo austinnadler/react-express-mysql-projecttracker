@@ -17,7 +17,7 @@ class ProjectTable extends React.Component {
         this.renderMe = this.renderMe.bind(this);
     }
 
-    // this method is passed to taskForm to trigger an update when a task is submitted
+    // this method is passed to taskForm to trigger an update when a task is submitted. won't be needed when on server, just refresh the page instead
     renderMe() {
         this.forceUpdate();
     }
