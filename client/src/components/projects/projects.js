@@ -26,7 +26,7 @@ class Projects extends React.Component {
         this.state = {
             projects: [],
             showDeleteModal: false,
-            projectToDelete: {}, // Alert is always rendered, so give this an empty object instead of null to prevent errors
+            projectToDelete: {}, // Modal is always rendered, so give this an empty object instead of null to prevent errors
             newProject: {},
             editingProject: false,
             nameCharsRemaining: maxLength,
@@ -43,17 +43,20 @@ class Projects extends React.Component {
 
     componentDidMount() {
         document.title = "Projects";
+        this.getProjects();
+    }
+
+    getProjects() {
         let _projects = [];
-        Axios.get("http://localhost:3001/projects").then((response) => {
+        Axios.get("http://localhost:3001/projects").then(response => {
             _projects = response.data;
             _projects.forEach(p => {
-                Axios.get(`http://localhost:3001/numProjectTasks/${p.id}`).then((response) => {
+                Axios.get(`http://localhost:3001/numProjectTasks/${p.id}`).then(response => {
                     p.numTasks = response.data[0].numTasks;
                     this.setState({ projects: _projects });
                 });
             });
         });
-
     }
 
     goTo(id, e) {
@@ -62,11 +65,13 @@ class Projects extends React.Component {
     }
 
     handleDelete(pid) {
-        let _projects = this.state.projects.filter(p => p.id !== pid)
-        this.setState({
-            projects: _projects,
-            showDeleteModal: false
+        Axios.delete(`http://localhost:3001/deleteProject/${pid}`).then(response => {
+            this.setState({
+                projects: this.state.projects.filter(p => p.id !== pid),
+                showDeleteModal: false
+            });
         });
+
     }
 
     handleDeleteConfirm(p, e) {
@@ -163,16 +168,6 @@ class Projects extends React.Component {
             projectModalTitle = "New project";
         }
         return (
-            // this.state.projects.map(p => {
-            //     return(
-            //         <tr key={p.id}>
-            //             <td>{p.id}</td>
-            //             <td>{p.name}</td>
-            //             <td>{p.description}</td>
-            //         </tr>
-            //     )
-            // })
-            //<h1>Projects component loaded</h1>
             <Container>
                 <Modal show={this.state.showDeleteModal}>
                     <Modal.Header>
