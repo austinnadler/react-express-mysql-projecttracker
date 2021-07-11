@@ -26,7 +26,7 @@ app.get("/projects", (req, res) => {
 
 app.get("/numProjectTasks/:projectId", (req, res) => {
     const projectId = req.params.projectId;
-    db.query("SELECT COUNT(*) as numTasks FROM task WHERE id = ?",
+    db.query("SELECT COUNT(*) as numTasks FROM task WHERE projectId = ?",
     projectId,
     (err, result) => {
         if(err) {
