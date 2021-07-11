@@ -138,12 +138,11 @@ class Projects extends React.Component {
         console.log("projects.length before update: " + this.state.projects.length);
         console.log("_projects.length before update: " + _projects.length);
         if (this.state.editingProject) {
-            _projects.forEach(p => {
-                if (p.id === this.state.newProject.id) {
-                    p.name = this.state.newProject.name;
-                    p.description = this.state.newProject.description;
+            Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`, { name: this.state.newProject.name, description: this.state.newProject.description }).then(
+                (response) => {
+                    this.getProjects();
                 }
-            });
+            );
         } else {
             Axios.post("http://localhost:3001/insertProject", {
                 name: this.state.newProject.name,

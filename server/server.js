@@ -16,7 +16,7 @@ const db = mysql.createConnection({
 /* -------------------- /projects --------------------  */
 app.get("/projects", (req, res) => {
     db.query("SELECT id, name, description FROM project", (err, result) => {
-        if(err) {
+        if (err) {
             console.log(err);
         } else {
             res.send(result);
@@ -27,28 +27,28 @@ app.get("/projects", (req, res) => {
 app.get("/numProjectTasks/:projectId", (req, res) => {
     const projectId = req.params.projectId;
     db.query("SELECT COUNT(*) as numTasks FROM task WHERE projectId = ?",
-    projectId,
-    (err, result) => {
-        if(err) {
-            console.log(err);
-        } else {
-            res.send(result);
-        }
-    });
+        projectId,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+        });
 });
 
 app.delete("/deleteProject/:projectId", (req, res) => {
     // MySQL database cascades on project deletion to delete associated tasks
     const projectId = Number(req.params.projectId);
     db.query("DELETE from project WHERE id = ?",
-    projectId,
-    (err, result) => {
-        if(err) {
-            console.log(err);
-        } else {
-            res.send(result);
-        }
-    });
+        projectId,
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+        });
 });
 
 app.post("/insertProject", (req, res) => {
@@ -56,30 +56,43 @@ app.post("/insertProject", (req, res) => {
     const description = req.body.description;
 
     db.query("INSERT INTO project (name, description) values (?, ?)",
-    [name, description],
-    (err, result) => {
-        if(err) {
-            console.log(err);
-        } else {
-            res.send("Insert success");
-        }
-    });
+        [name, description],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Insert success");
+            }
+        });
 });
 
-app.put("/updateProject", (req, res) => {
-
+app.put("/updateProject/:projectId", (req, res) => {
+    const projectId = Number(req.params.projectId);
+    const name = req.body.name;
+    const description = req.body.description;
+    db.query(
+        "UPDATE project SET name = ?, description = ? WHERE id = ?",
+        [name, description, projectId],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+        }
+    );
 });
 /* -------------------- end /projects --------------------  */
 
 app.get("/tasks", (req, res) => {
     db.query("SELECT t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId",
-    (err, result) => {
-        if(err) {
-            console.log(err);
-        } else {
-            res.send(result);
-        }
-    });
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+        });
 });
 
 const port = 3001;
