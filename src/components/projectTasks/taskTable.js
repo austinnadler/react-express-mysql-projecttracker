@@ -12,11 +12,11 @@ import tasks from '../../assets/data/tasks';
 
 const maxLength = 200;
 
-class ProjectTable extends React.Component {
+class TaskTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            tasks: tasks,
+            tasks: tasks.sort((a, b) => { return a.id - b.id }), // sort ascening
             showTaskModal: false,
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength,
@@ -115,9 +115,9 @@ class ProjectTable extends React.Component {
     render() {
         let taskModalTitle;
         if (this.state.editingTask) {
-            taskModalTitle = <Modal.Title>Editing task <i>{this.state.taskNameBeforeEdit}</i></Modal.Title>
+            taskModalTitle = <div>Editing task <i>{this.state.taskNameBeforeEdit}</i></div>
         } else {
-            taskModalTitle = <Modal.Title>New task for <i>{this.props.project.name}</i></Modal.Title>
+            taskModalTitle = <div>New task for <i>{this.props.project.name}</i></div>
         }
 
         var table;
@@ -142,28 +142,12 @@ class ProjectTable extends React.Component {
                                         <td>{t.name}</td>
                                         <td>{t.description}</td>
                                         <td className="text-center">
-                                            <OverlayTrigger
-                                                placement="top"
-                                                delay={{ hide: 100 }}
-                                                overlay={
-                                                    <Tooltip>
-                                                        Edit this task
-                                                    </Tooltip>
-                                                }
-                                            >
+                                            <OverlayTrigger  placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Edit this task</Tooltip>}>
                                                 <Button variant="primary" onClick={(e) => this.showTaskModal(t, e)}><FontAwesomeIcon icon={faEdit} /></Button>
                                             </OverlayTrigger>
                                         </td>
                                         <td className="text-center">
-                                            <OverlayTrigger
-                                                placement="top"
-                                                delay={{ hide: 100 }}
-                                                overlay={
-                                                    <Tooltip>
-                                                        Delete this task
-                                                    </Tooltip>
-                                                }
-                                            >
+                                            <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Delete this task</Tooltip>}>
                                                 <Button variant="danger" onClick={() => this.handleDelete(t.id)}><FontAwesomeIcon icon={faTrash} /></Button>
                                             </OverlayTrigger>
                                         </td>
@@ -180,7 +164,7 @@ class ProjectTable extends React.Component {
                     <Button onClick={() => this.showTaskModal(null)}><FontAwesomeIcon icon={faPlusSquare} /> New Task</Button>
                     <Modal show={this.state.showTaskModal}>
                         <Modal.Header>
-                            {taskModalTitle}
+                            <Modal.Title>{taskModalTitle}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <Form.Group>
@@ -209,4 +193,4 @@ class ProjectTable extends React.Component {
         )
     }
 }
-export default ProjectTable;
+export default TaskTable;

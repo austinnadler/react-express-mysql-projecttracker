@@ -21,9 +21,9 @@ class Projects extends React.Component {
         projects.forEach(p => {
             p.tasks = tasks.filter(t => t.projectId === p.id);
         });
-        let _projects = projects.sort((a, b) => { return a.id - b.id }); // sort ascending
+        
         this.state = {
-            projects: _projects,
+            projects: projects.sort((a, b) => { return a.id - b.id }), // sort ascending
             showDeleteModal: false,
             projectToDelete: {}, // Alert is always rendered, so give this an empty object instead of null to prevent errors
             newProject: {},
@@ -49,19 +49,19 @@ class Projects extends React.Component {
         this.props.history.push(`/tasks/${id}`);
     }
 
-    handleDeleteConfirm(p, e) {
-        e.stopPropagation();
-        this.setState({
-            projectToDelete: p,
-            showDeleteModal: true
-        });
-    }
-
     handleDelete(pid) {
         let _projects = this.state.projects.filter(p => p.id !== pid)
         this.setState({
             projects: _projects,
             showDeleteModal: false
+        });
+    }
+
+    handleDeleteConfirm(p, e) {
+        e.stopPropagation();
+        this.setState({
+            projectToDelete: p,
+            showDeleteModal: true
         });
     }
 
@@ -146,9 +146,9 @@ class Projects extends React.Component {
     render() {
         var projectModalTitle;
         if (this.state.editingProject) {
-            projectModalTitle = <Modal.Title>Editing project&nbsp;<i>{this.state.projectNameBeforeEdit}</i></Modal.Title>
+            projectModalTitle = <div>Editing project&nbsp;<i>{this.state.projectNameBeforeEdit}</i></div>
         } else {
-            projectModalTitle = <Modal.Title>New project</Modal.Title>;
+            projectModalTitle = "New project";
         }
         return (
             <Container>
@@ -168,7 +168,7 @@ class Projects extends React.Component {
                 </Modal>
                 <Modal show={this.state.showProjectModal}>
                     <Modal.Header>
-                        {projectModalTitle}
+                        <Modal.Title>{projectModalTitle}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Group>
@@ -204,8 +204,7 @@ class Projects extends React.Component {
                                                 <h4 className="d-inline-block mb-0">{p.name}</h4>
                                             </Col>
                                             <Col xs={1}>
-                                                <OverlayTrigger placement="top" delay={{ hide: 100 }}
-                                                    overlay={<Tooltip>Edit this project</Tooltip>}>
+                                                <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Edit this project</Tooltip>}>
                                                     <Button size="sm" variant="primary" className="float-right" onMouseDown={(e) => this.showProjectModal(p, e)}><FontAwesomeIcon icon={faEdit} /></Button>
                                                 </OverlayTrigger>
                                             </Col>
