@@ -1,0 +1,10 @@
+.inner {
+    border: 1px solid rgb(190, 190, 190);
+    border-radius: 5px;
+    height: 100%;
+}
+
+.inner:hover {
+    cursor: pointer;
+    background: #ededed;
+}
