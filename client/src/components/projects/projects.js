@@ -135,6 +135,8 @@ class Projects extends React.Component {
             return;
         }
         let _projects = [...this.state.projects];
+        console.log("projects.length before update: " + this.state.projects.length);
+        console.log("_projects.length before update: " + _projects.length);
         if (this.state.editingProject) {
             _projects.forEach(p => {
                 if (p.id === this.state.newProject.id) {
@@ -143,11 +145,11 @@ class Projects extends React.Component {
                 }
             });
         } else {
-            _projects.push({
-                id: this.state.projects[this.state.projects.length - 1].id + 1,
+            Axios.post("http://localhost:3001/insertProject", {
                 name: this.state.newProject.name,
                 description: this.state.newProject.description,
-                tasks: []
+            }).then(() => {
+                this.getProjects();
             });
         }
         this.setState({
@@ -218,7 +220,7 @@ class Projects extends React.Component {
                                     <div className="inner shadow p-3">
                                         <Row>
                                             <Col xs={10}>
-                                                <h4 className="d-inline-block mb-0">{p.name}</h4>
+                                                <h4 className="d-inline-block mb-0">{p.name} - {p.id}</h4>
                                             </Col>
                                             <Col xs={1}>
                                                 <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Edit this project</Tooltip>}>

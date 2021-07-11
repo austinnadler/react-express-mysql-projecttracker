@@ -46,14 +46,24 @@ app.delete("/deleteProject/:projectId", (req, res) => {
         if(err) {
             console.log(err);
         } else {
-            console.log(result);
             res.send(result);
         }
     });
 });
 
 app.post("/insertProject", (req, res) => {
+    const name = req.body.name;
+    const description = req.body.description;
 
+    db.query("INSERT INTO project (name, description) values (?, ?)",
+    [name, description],
+    (err, result) => {
+        if(err) {
+            console.log(err);
+        } else {
+            res.send("Insert success");
+        }
+    });
 });
 
 app.put("/updateProject", (req, res) => {
@@ -62,7 +72,7 @@ app.put("/updateProject", (req, res) => {
 /* -------------------- end /projects --------------------  */
 
 app.get("/tasks", (req, res) => {
-    db.query("SELECT p.name, t.name, t.description FROM task t, project p WHERE p.id = t.projectId",
+    db.query("SELECT t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId",
     (err, result) => {
         if(err) {
             console.log(err);
