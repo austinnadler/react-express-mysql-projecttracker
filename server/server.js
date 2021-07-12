@@ -175,7 +175,7 @@ app.delete("/deleteTask/:taskId", (req, res) => {
 
 app.get("/tasks", (req, res) => {
     db.query(
-        "SELECT t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId",
+        "SELECT p.id as projectId, t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
         (err, result) => {
             if (err) {
                 console.log(err);
