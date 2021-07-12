@@ -49,7 +49,7 @@ class Projects extends React.Component {
     getProjects() {
         let _projects = [];
         Axios.get("http://localhost:3001/projects").then(response => {
-            _projects = response.data;
+            _projects = [...response.data];
             _projects.forEach(p => {
                 Axios.get(`http://localhost:3001/numProjectTasks/${p.id}`).then(response => {
                     p.numTasks = response.data[0].numTasks;
@@ -134,17 +134,17 @@ class Projects extends React.Component {
             alert("All fields are required");
             return;
         }
-        let _projects = [...this.state.projects];
-        console.log("projects.length before update: " + this.state.projects.length);
-        console.log("_projects.length before update: " + _projects.length);
         if (this.state.editingProject) {
-            Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`, { name: this.state.newProject.name, description: this.state.newProject.description }).then(
-                (response) => {
-                    this.getProjects();
-                }
-            );
+            Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
+            { 
+                name: this.state.newProject.name,
+                description: this.state.newProject.description 
+            }).then(() => {
+                this.getProjects();
+            });
         } else {
-            Axios.post("http://localhost:3001/insertProject", {
+            Axios.post("http://localhost:3001/insertProject",
+            {
                 name: this.state.newProject.name,
                 description: this.state.newProject.description,
             }).then(() => {
@@ -152,7 +152,6 @@ class Projects extends React.Component {
             });
         }
         this.setState({
-            projects: _projects,
             showProjectModal: false,
             editingProject: false,
             newProject: {},
@@ -219,7 +218,7 @@ class Projects extends React.Component {
                                     <div className="inner shadow p-3">
                                         <Row>
                                             <Col xs={10}>
-                                                <h4 className="d-inline-block mb-0">{p.name} - {p.id}</h4>
+                                                <h4 className="d-inline-block mb-0">{p.name}</h4>
                                             </Col>
                                             <Col xs={1}>
                                                 <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Edit this project</Tooltip>}>

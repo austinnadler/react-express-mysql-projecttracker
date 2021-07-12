@@ -6,7 +6,7 @@ import Table from 'react-bootstrap/Table';
 // import tasks from '../../assets/data/tasks';
 import Axios from 'axios';
 
-class Projects extends React.Component {
+class Tasks extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -55,4 +55,4 @@ class Projects extends React.Component {
         )
     };
 }
-export default Projects;
+export default Tasks;

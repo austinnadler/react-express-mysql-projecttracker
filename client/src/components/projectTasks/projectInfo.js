@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Axios from "axios";
 
 const maxLength = 200;
 
@@ -12,7 +13,7 @@ class ProjectInfo extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            project: props.project,
+            project: {},
             _project: {},
             editProject: false,
             nameCharsRemaining: maxLength,
@@ -27,6 +28,15 @@ class ProjectInfo extends React.Component {
 
     componentDidMount() {
         document.title = this.state.project.name;
+        this.getProject();
+    }
+
+    getProject() {
+        var _project = {};
+        Axios.get(`http://localhost:3001/project/${this.props.projectId}`).then(response => {
+            _project = { ...response.data[0] };
+            this.setState({ project: _project });
+        });
     }
 
     showProjectEditModal() {
@@ -45,7 +55,7 @@ class ProjectInfo extends React.Component {
     handleNameChange(e) {
         var _p = this.state._project;
         _p.name = e.target.value;
-        this.setState({ 
+        this.setState({
             _project: _p,
             nameCharsRemaining: maxLength - _p.name.length
         });
@@ -54,11 +64,11 @@ class ProjectInfo extends React.Component {
     handleDescriptionChange(e) {
         var _p = this.state._project;
         _p.description = e.target.value;
-        this.setState({  
+        this.setState({
             _project: _p,
             descriptionCharsRemaining: maxLength - _p.description.length
         });
-        
+
     }
 
     handleProjectSubmit(e) {
@@ -68,11 +78,16 @@ class ProjectInfo extends React.Component {
             alert("All fields are required");
             return;
         }
-        this.setState({
-            project: { ...this.state._project },
-            editProject: false,
-            showAlert: true
-        });
+        Axios.put(`http://localhost:3001/updateProject/${this.props.projectId}`,
+        { name: this.state._project.name, description: this.state._project.description }).then(
+            (response) => {
+                this.setState({
+                    project: this.state._project,
+                    editProject: false,
+                    showAlert: true
+                });
+            }
+        );
         document.title = this.state.project.name;
     }
 
