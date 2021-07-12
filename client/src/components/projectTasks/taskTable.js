@@ -92,7 +92,6 @@ class TaskTable extends React.Component {
     }
 
     handleTaskSubmit() {
-        // this is where insert task call to server will go
         if (!this.state.newTask.name || !this.state.newTask.description) {
             alert("All fields are required");
             return;

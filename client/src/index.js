@@ -20,8 +20,8 @@ ReactDOM.render(
                 <Route exact path="/tasks" component={Tasks} />
                 <Route path="/tasks/:pid" component={ProjectTasks} />
             </Switch>
+            {/* <Footer />  */}
         </Router>
-        // <Footer />
     // </React.StrictMode>  
   ,document.getElementById('root')
 );

@@ -72,7 +72,6 @@ class ProjectInfo extends React.Component {
     }
 
     handleProjectSubmit(e) {
-        // This is where the update call to server will go
         e.preventDefault();
         if (this.state._project.name === "" || this.state._project.description === "") {
             alert("All fields are required");

@@ -11,18 +11,12 @@ import Button from 'react-bootstrap/Button';
 import { faTrash, faPlusSquare, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Axios from 'axios';
-// import projects from '../../assets/data/projects';
-// import tasks from '../../assets/data/tasks';
 
 const maxLength = 200;
 
 class Projects extends React.Component {
     constructor(props) {
         super(props);
-        // projects.forEach(p => {
-        //     p.tasks = tasks.filter(t => t.projectId === p.id);
-        // });
-
         this.state = {
             projects: [],
             showDeleteModal: false,

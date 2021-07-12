@@ -2,8 +2,6 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-// import projects from '../../assets/data/projects';
-// import tasks from '../../assets/data/tasks';
 import Axios from 'axios';
 
 class Tasks extends React.Component {
@@ -26,6 +24,9 @@ class Tasks extends React.Component {
             <Container>
                 <Col xs={12} className="mt-3 mb-3 text-center">
                     <h1 className="text-success">Tasks</h1>
+                    <div>
+                        Select a project from the projects page to edit tasks.
+                    </div>
                 </Col>
                 <Table striped responsive>
                     <thead>
