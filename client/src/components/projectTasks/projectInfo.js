@@ -27,8 +27,8 @@ class ProjectInfo extends React.Component {
     }
 
     componentDidMount() {
-        document.title = this.state.project.name;
         this.getProject();
+        
     }
 
     getProject() {
@@ -36,6 +36,7 @@ class ProjectInfo extends React.Component {
         Axios.get(`http://localhost:3001/project/${this.props.projectId}`).then(response => {
             _project = { ...response.data[0] };
             this.setState({ project: _project });
+            document.title = _project.name;
         });
     }
 
