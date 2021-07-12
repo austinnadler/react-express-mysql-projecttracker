@@ -1,3 +1,9 @@
+# Project Info
+
+This project contains two applications, client and server.
+
+client is a react app that runs on port 3000, pulling data from the server app that runs on port 3001.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
