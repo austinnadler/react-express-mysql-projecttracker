@@ -13,6 +13,9 @@ const db = mysql.createConnection({
     database: 'ptracker'
 });
 
+const port = 3001;
+app.listen(port, () => console.log("Server running on port " + port));
+
 /* -------------------- /projects --------------------  */
 
 app.get("/projects", (req, res) => {
@@ -24,7 +27,8 @@ app.get("/projects", (req, res) => {
             } else {
                 res.send(result);
             }
-        });
+        }
+    );
 });
 
 app.get("/numProjectTasks/:projectId", (req, res) => {
@@ -38,7 +42,8 @@ app.get("/numProjectTasks/:projectId", (req, res) => {
             } else {
                 res.send(result);
             }
-        });
+        }
+    );
 });
 app.post("/insertProject", (req, res) => {
     const name = req.body.name;
@@ -53,7 +58,8 @@ app.post("/insertProject", (req, res) => {
             } else {
                 res.send("Insert success");
             }
-        });
+        }
+    );
 });
 
 app.put("/updateProject/:projectId", (req, res) => {
@@ -85,7 +91,8 @@ app.delete("/deleteProject/:projectId", (req, res) => {
             } else {
                 res.send(result);
             }
-        });
+        }
+    );
 });
 
 /* -------------------- end /projects --------------------  */
@@ -103,7 +110,8 @@ app.get(`/project/:projectId`, (req, res) => {
             } else {
                 res.send(result);
             }
-        });
+        }
+    );
 });
 
 app.get(`/projectTasks/:projectId`, (req, res) => {
@@ -117,7 +125,8 @@ app.get(`/projectTasks/:projectId`, (req, res) => {
             } else {
                 res.send(result);
             }
-        });
+        }
+    );
 });
 
 app.post("/createTask/:projectId", (req, res) => {
@@ -133,7 +142,8 @@ app.post("/createTask/:projectId", (req, res) => {
             } else {
                 res.send("Insert success");
             }
-        });
+        }
+    );
 });
 
 app.put("/updateTask/:taskId", (req, res) => {
@@ -150,7 +160,7 @@ app.put("/updateTask/:taskId", (req, res) => {
                 res.send(result);
             }
         }
-    )
+    );
 });
 
 app.delete("/deleteTask/:taskId", (req, res) => {
@@ -165,8 +175,7 @@ app.delete("/deleteTask/:taskId", (req, res) => {
                 res.send(result);
             }
         }
-
-    )
+    );
 });
 
 /* -------------------- end /projectTasks --------------------  */
@@ -182,10 +191,8 @@ app.get("/tasks", (req, res) => {
             } else {
                 res.send(result);
             }
-        });
+        }
+    );
 });
 
 /* -------------------- end /tasks --------------------  */
-
-const port = 3001;
-app.listen(port, () => console.log("Server running on port " + port));
