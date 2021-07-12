@@ -86,6 +86,7 @@ class ProjectInfo extends React.Component {
                     editProject: false,
                     showAlert: true
                 });
+                document.title = this.state._project.name;
             }
         );
         document.title = this.state.project.name;
