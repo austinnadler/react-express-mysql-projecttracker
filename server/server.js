@@ -14,6 +14,7 @@ const db = mysql.createConnection({
 });
 
 /* -------------------- /projects --------------------  */
+
 app.get("/projects", (req, res) => {
     db.query(
         "SELECT id, name, description FROM project",
@@ -171,6 +172,7 @@ app.delete("/deleteTask/:taskId", (req, res) => {
 /* -------------------- end /projectTasks --------------------  */
 
 /* -------------------- /tasks --------------------  */
+
 app.get("/tasks", (req, res) => {
     db.query(
         "SELECT t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId",
