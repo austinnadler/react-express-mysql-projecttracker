@@ -19,6 +19,7 @@ class Projects extends React.Component {
         super(props);
         this.state = {
             projects: [],
+            states: {},
             showDeleteModal: false,
             projectToDelete: {}, // Modal is always rendered, so give this an empty object instead of null to prevent errors
             newProject: {},
@@ -38,6 +39,7 @@ class Projects extends React.Component {
     componentDidMount() {
         document.title = "Projects";
         this.getProjects();
+        this.getStates();
     }
 
     getProjects() {
@@ -45,12 +47,20 @@ class Projects extends React.Component {
         Axios.get("http://localhost:3001/projects").then(response => {
             _projects = [...response.data];
             _projects.forEach(p => {
+                // p.state
                 Axios.get(`http://localhost:3001/numProjectTasks/${p.id}`).then(response => {
                     p.numTasks = response.data[0].numTasks;
                     this.setState({ projects: _projects });
                 });
             });
         });
+    }
+
+    getStates = async () => {
+        let data = {};
+        let res = await Axios.get("http://localhost:3001/states");
+        data = res.data;
+        // this.setState({ states: {..._states} });
     }
 
     goTo(id, e) {
@@ -123,27 +133,30 @@ class Projects extends React.Component {
         });
     }
 
-    handleProjectSubmit() {
+    handleProjectSubmit = async () => {
         if (!this.state.newProject.name || !this.state.newProject.description) {
             alert("All fields are required");
             return;
         }
         if (this.state.editingProject) {
-            Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
-            { 
-                name: this.state.newProject.name,
-                description: this.state.newProject.description 
-            }).then(() => {
-                this.getProjects();
-            });
+            let _projects = [...this.state.projects];
+            let res = await Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
+                {
+                    name: this.state.newProject.name,
+                    description: this.state.newProject.description
+                });
+                let _p = _projects.find(p => p.id === this.state.newProject.id);
+                _p.name = this.state.newProject.name;
+                _p.description = this.state.newProject.description;
+                this.setState({ projects: _projects });
         } else {
             Axios.post("http://localhost:3001/insertProject",
-            {
-                name: this.state.newProject.name,
-                description: this.state.newProject.description,
-            }).then(() => {
-                this.getProjects();
-            });
+                {
+                    name: this.state.newProject.name,
+                    description: this.state.newProject.description,
+                }).then(() => {
+                    this.getProjects(); // New project is being created, need to qoery the db after inserting to get the id in case the project needs to be edited or deleted immediately
+                });
         }
         this.setState({
             showProjectModal: false,
@@ -225,7 +238,9 @@ class Projects extends React.Component {
                                                 </OverlayTrigger>
                                             </Col>
                                             <Col xs={12}>
-                                                <small className={"text-muted " + (p.numTasks === 0 ? "d-none" : "")}>{p.numTasks} tasks</small>
+                                                <small className="text-muted">
+                                                    {p.state} - {p.numTasks} tasks
+                                                </small>
                                             </Col>
                                         </Row>
                                         <div>{p.description}</div>

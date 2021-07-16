@@ -27,8 +27,7 @@ class ProjectInfo extends React.Component {
     }
 
     componentDidMount() {
-        this.getProject();
-        
+        this.getProject();        
     }
 
     getProject() {
@@ -69,7 +68,6 @@ class ProjectInfo extends React.Component {
             _project: _p,
             descriptionCharsRemaining: maxLength - _p.description.length
         });
-
     }
 
     handleProjectSubmit(e) {

@@ -20,7 +20,7 @@ app.listen(port, () => console.log("Server running on port " + port));
 
 app.get("/projects", (req, res) => {
     db.query(
-        "SELECT id, name, description FROM project",
+        "SELECT id, name, description, state FROM project",
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -34,7 +34,8 @@ app.get("/projects", (req, res) => {
 app.get("/numProjectTasks/:projectId", (req, res) => {
     const projectId = req.params.projectId;
     db.query(
-        "SELECT COUNT(*) as numTasks FROM task WHERE projectId = ?",
+        // Count the tasks whose state is not 30 (Complete)
+        "SELECT COUNT(*) as numTasks FROM task WHERE projectId = ? AND state != 30",
         projectId,
         (err, result) => {
             if (err) {
@@ -50,7 +51,7 @@ app.post("/insertProject", (req, res) => {
     const description = req.body.description;
 
     db.query(
-        "INSERT INTO project (name, description) values (?, ?)",
+        "INSERT INTO project (name, description, state) values (?, ?, 10)",
         [name, description],
         (err, result) => {
             if (err) {
@@ -196,3 +197,25 @@ app.get("/tasks", (req, res) => {
 });
 
 /* -------------------- end /tasks --------------------  */
+
+/* -------------------- /states --------------------  */
+
+app.get("/states", (req, res) => {
+    db.query(
+        "SELECT value, display_value FROM choice where type = 'state'",
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                //res.send(result);
+                let states = {};
+                states.new = result[0];
+                states.wip = result[1];
+                states.complete = result[2];
+                res.send(states);
+            }
+        }
+    );
+});
+
+/* -------------------- end /states --------------------  */
