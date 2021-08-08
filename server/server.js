@@ -20,7 +20,7 @@ app.listen(port, () => console.log("Server running on port " + port));
 
 app.get("/projects", (req, res) => {
     db.query(
-        "SELECT p.id, p.name, p.description, c.display_value as 'state' FROM project p, choice c WHERE p.state = c.value;",
+        "SELECT p.id, p.name, p.description, p.state, c.display_value as 'state_display' FROM project p, choice c WHERE p.state = c.value ORDER BY p.state, p.id;",
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -49,10 +49,10 @@ app.get("/numProjectTasks/:projectId", (req, res) => {
 app.post("/insertProject", (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
-
+    const state = req.body.state;
     db.query(
-        "INSERT INTO project (name, description, state) values (?, ?, 10)",
-        [name, description],
+        "INSERT INTO project (name, description, state) values (?, ?, ?)",
+        [name, description, state],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -67,9 +67,10 @@ app.put("/updateProject/:projectId", (req, res) => {
     const projectId = Number(req.params.projectId);
     const name = req.body.name;
     const description = req.body.description;
+    const state = req.body.state;
     db.query(
-        "UPDATE project SET name = ?, description = ? WHERE id = ?",
-        [name, description, projectId],
+        "UPDATE project SET name = ?, description = ?, state = ? WHERE id = ?",
+        [name, description, state, projectId],
         (err, result) => {
             if (err) {
                 console.log(err);

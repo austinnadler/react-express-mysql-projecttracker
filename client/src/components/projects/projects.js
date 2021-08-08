@@ -21,7 +21,7 @@ class Projects extends React.Component {
             projects: [],
             states: [],
             showDeleteModal: false,
-            projectToDelete: {}, // Modal is always rendered, so give this an empty object instead of null to prevent errors
+            projectToDelete: {}, // Modal is always "rendered", so give this an empty object instead of null to prevent errors
             newProject: {},
             editingProject: false,
             nameCharsRemaining: maxLength,
@@ -30,6 +30,7 @@ class Projects extends React.Component {
         this.handleDelete = this.handleDelete.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.handleStateChange = this.handleStateChange.bind(this);
         this.handleDeleteCancel = this.handleDeleteCancel.bind(this);
         this.showProjectModal = this.showProjectModal.bind(this);
         this.hideProjectModal = this.hideProjectModal.bind(this);
@@ -72,7 +73,6 @@ class Projects extends React.Component {
                 showDeleteModal: false
             });
         });
-
     }
 
     handleDeleteConfirm(p, e) {
@@ -130,6 +130,12 @@ class Projects extends React.Component {
         });
     }
 
+    handleStateChange(e) {
+        let newProject = {...this.state.newProject};
+        newProject.state = e.target.value;
+        this.setState({ newProject: newProject });
+    }
+
     handleProjectSubmit = async () => {
         if (!this.state.newProject.name || !this.state.newProject.description) {
             alert("All fields are required");
@@ -140,19 +146,22 @@ class Projects extends React.Component {
             await Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
                 {
                     name: this.state.newProject.name,
-                    description: this.state.newProject.description
+                    description: this.state.newProject.description,
+                    state: this.state.newProject.state
                 });
-                let _p = _projects.find(p => p.id === this.state.newProject.id);
-                _p.name = this.state.newProject.name;
-                _p.description = this.state.newProject.description;
-                this.setState({ projects: _projects });
+            let _p = _projects.find(p => p.id === this.state.newProject.id);
+            _p.name = this.state.newProject.name;
+            _p.description = this.state.newProject.description;
+            _p.state = this.state.newProject.state;
+            this.setState({ projects: _projects });
         } else {
             Axios.post("http://localhost:3001/insertProject",
                 {
                     name: this.state.newProject.name,
                     description: this.state.newProject.description,
+                    state: this.state.newProject.state
                 }).then(() => {
-                    this.getProjects(); // New project is being created, need to qoery the db after inserting to get the id in case the project needs to be edited or deleted immediately
+                    this.getProjects(); // New project is being created, need to query the db after inserting to get the id in case the project needs to be edited or deleted immediately
                 });
         }
         this.setState({
@@ -204,8 +213,11 @@ class Projects extends React.Component {
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>State</Form.Label>
-                            <Form.Control as="select">
+                            <Form.Control className="select" as="select" value={this.state.newProject.state} onChange={this.handleStateChange}>
                                 <option value="10">New</option>
+                                <option value="20">Work in Progress</option>
+                                <option value="30">On Hold</option>
+                                <option value="40">Complete</option>
                             </Form.Control>
                         </Form.Group>
                     </Modal.Body>
@@ -242,7 +254,7 @@ class Projects extends React.Component {
                                             </Col>
                                             <Col xs={12}>
                                                 <small className="text-muted">
-                                                    {p.state} - {p.numTasks} tasks
+                                                    {p.state_display} - {p.numTasks} tasks
                                                 </small>
                                             </Col>
                                         </Row>
