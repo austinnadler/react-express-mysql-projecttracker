@@ -19,7 +19,7 @@ class Projects extends React.Component {
         super(props);
         this.state = {
             projects: [],
-            states: {},
+            states: [],
             showDeleteModal: false,
             projectToDelete: {}, // Modal is always rendered, so give this an empty object instead of null to prevent errors
             newProject: {},
@@ -38,8 +38,8 @@ class Projects extends React.Component {
 
     componentDidMount() {
         document.title = "Projects";
-        this.getProjects();
         this.getStates();
+        this.getProjects();        
     }
 
     getProjects() {
@@ -47,7 +47,6 @@ class Projects extends React.Component {
         Axios.get("http://localhost:3001/projects").then(response => {
             _projects = [...response.data];
             _projects.forEach(p => {
-                // p.state
                 Axios.get(`http://localhost:3001/numProjectTasks/${p.id}`).then(response => {
                     p.numTasks = response.data[0].numTasks;
                     this.setState({ projects: _projects });
@@ -57,10 +56,8 @@ class Projects extends React.Component {
     }
 
     getStates = async () => {
-        let data = {};
         let res = await Axios.get("http://localhost:3001/states");
-        data = res.data;
-        // this.setState({ states: {..._states} });
+        this.setState({ states: {...res.data} });
     }
 
     goTo(id, e) {
@@ -140,7 +137,7 @@ class Projects extends React.Component {
         }
         if (this.state.editingProject) {
             let _projects = [...this.state.projects];
-            let res = await Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
+            await Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
                 {
                     name: this.state.newProject.name,
                     description: this.state.newProject.description
@@ -204,6 +201,12 @@ class Projects extends React.Component {
                             <Form.Label>Description</Form.Label>
                             <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProject.description} onChange={this.handleDescriptionChange} />
                             <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>State</Form.Label>
+                            <Form.Control as="select">
+                                <option value="10">New</option>
+                            </Form.Control>
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>

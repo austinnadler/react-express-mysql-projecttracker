@@ -20,7 +20,7 @@ app.listen(port, () => console.log("Server running on port " + port));
 
 app.get("/projects", (req, res) => {
     db.query(
-        "SELECT id, name, description, state FROM project",
+        "SELECT p.id, p.name, p.description, c.display_value as 'state' FROM project p, choice c WHERE p.state = c.value;",
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -35,7 +35,7 @@ app.get("/numProjectTasks/:projectId", (req, res) => {
     const projectId = req.params.projectId;
     db.query(
         // Count the tasks whose state is not 30 (Complete)
-        "SELECT COUNT(*) as numTasks FROM task WHERE projectId = ? AND state != 30",
+        "SELECT COUNT(*) as numTasks FROM task WHERE projectId = ? AND state != 40",
         projectId,
         (err, result) => {
             if (err) {
@@ -202,17 +202,12 @@ app.get("/tasks", (req, res) => {
 
 app.get("/states", (req, res) => {
     db.query(
-        "SELECT value, display_value FROM choice where type = 'state'",
+        "SELECT value, display_value FROM choice WHERE type = 'state'",
         (err, result) => {
             if (err) {
                 console.log(err);
             } else {
-                //res.send(result);
-                let states = {};
-                states.new = result[0];
-                states.wip = result[1];
-                states.complete = result[2];
-                res.send(states);
+                res.send(result);
             }
         }
     );
