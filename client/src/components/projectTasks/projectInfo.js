@@ -77,7 +77,11 @@ class ProjectInfo extends React.Component {
             return;
         }
         Axios.put(`http://localhost:3001/updateProject/${this.props.projectId}`,
-        { name: this.state._project.name, description: this.state._project.description }).then(
+        {
+            name: this.state._project.name,
+            description: this.state._project.description,
+            state: this.state.project.state // using project instead of _project because state will not change
+        }).then(
             (response) => {
                 this.setState({
                     project: this.state._project,
