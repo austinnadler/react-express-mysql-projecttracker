@@ -21,12 +21,13 @@ class TaskTable extends React.Component {
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength,
             editingTask: false,
-            newTask: {}
+            _task: {}
         }
         this.showTaskModal = this.showTaskModal.bind(this);
         this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.handleStateChange = this.handleStateChange.bind(this);
         this.hideTaskModal = this.hideTaskModal.bind(this);
     }
 
@@ -61,7 +62,7 @@ class TaskTable extends React.Component {
             this.setState({
                 editingTask: true,
                 taskNameBeforeEdit: task.name,
-                newTask: task,
+                _task: task,
                 nameCharsRemaining: maxLength - task.name.length,
                 descriptionCharsRemaining: maxLength - task.description.length,
             });
@@ -73,28 +74,35 @@ class TaskTable extends React.Component {
             showTaskModal: false,
             editingTask: false,
             taskNameBeforeEdit: null,
-            newTask: {},
+            _task: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
     }
 
     handleNameChange(e) {
-        let newTask = { ...this.state.newTask };
-        newTask.name = e.target.value;
+        let _task = { ...this.state._task };
+        _task.name = e.target.value;
         this.setState({
-            newTask: newTask,
+            _task: _task,
             nameCharsRemaining: maxLength - e.target.value.length
         });
     }
 
     handleDescriptionChange(e) {
-        let newTask = { ...this.state.newTask };
-        newTask.description = e.target.value;;
+        let _task = { ...this.state._task };
+        _task.description = e.target.value;;
         this.setState({
-            newTask: newTask,
+            _task: _task,
             descriptionCharsRemaining: maxLength - e.target.value.length
         });
+    }
+
+    handleStateChange(e) {
+        let _task = {...this.state._task};
+        _task.state = e.target.value;
+        _task.state_display = this.getStateDisplayValue(_task);
+        this.setState({ _task: _task });
     }
 
     getStateDisplayValue(t) {
@@ -108,23 +116,24 @@ class TaskTable extends React.Component {
     }
 
     handleTaskSubmit() {
-        if (!this.state.newTask.name || !this.state.newTask.description) {
+        if (!this.state._task.name || !this.state._task.description) {
             alert("All fields are required");
             return;
         }
         if (this.state.editingTask) {
-            Axios.put(`http://localhost:3001/updateTask/${this.state.newTask.id}`,
+            Axios.put(`http://localhost:3001/updateTask/${this.state._task.id}`,
             {
-                name: this.state.newTask.name,
-                description: this.state.newTask.description,
+                name: this.state._task.name,
+                description: this.state._task.description,
+                state: this.state._task.state
             }).then(() => {
                 this.getTasks();
             });
         } else {
             Axios.post(`http://localhost:3001/createTask/${this.props.projectId}`,
                 {
-                    name: this.state.newTask.name,
-                    description: this.state.newTask.description,
+                    name: this.state._task.name,
+                    description: this.state._task.description
                 }).then(() => {
                     this.getTasks();
                 });
@@ -132,7 +141,7 @@ class TaskTable extends React.Component {
         this.setState({
             showTaskModal: false,
             editingTask: false,
-            newTask: {},
+            _task: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
@@ -140,8 +149,20 @@ class TaskTable extends React.Component {
 
     render() {
         let taskModalTitle = "";
+        let stateSelect;
         if (this.state.editingTask) {
             taskModalTitle = <div>Editing task <i>{this.state.taskNameBeforeEdit}</i></div>
+            stateSelect = 
+            <Form.Group>
+                <Form.Label>State</Form.Label>
+                <Form.Control className="select" as="select" value={this.state._task.state} onChange={this.handleStateChange}>
+                    {
+                        this.state.states.map((s) => {
+                            return(<option value={s.value} key={s.value}>{s.display_value}</option>)
+                        })
+                    }
+                </Form.Control>
+            </Form.Group>
         } else {
             taskModalTitle = <div>New task</div>
         }
@@ -197,14 +218,15 @@ class TaskTable extends React.Component {
                         <Modal.Body>
                             <Form.Group>
                                 <Form.Label>Task name</Form.Label>
-                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTask.name} onChange={this.handleNameChange}></Form.Control>
+                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state._task.name} onChange={this.handleNameChange}></Form.Control>
                                 <small className="text-muted">{this.state.nameCharsRemaining} characters remaining</small>
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Description</Form.Label>
-                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newTask.description} onChange={this.handleDescriptionChange} />
+                                <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state._task.description} onChange={this.handleDescriptionChange} />
                                 <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
                             </Form.Group>
+                            {stateSelect}
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="primary" onClick={this.handleTaskSubmit}>

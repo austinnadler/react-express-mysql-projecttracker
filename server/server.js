@@ -46,13 +46,14 @@ app.get("/numProjectTasks/:projectId", (req, res) => {
         }
     );
 });
-app.post("/insertProject", (req, res) => {
+
+// mysql database defaults state to 10 (new)
+app.post("/createProject", (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
-    const state = req.body.state;
     db.query(
-        "INSERT INTO project (name, description, state) values (?, ?, ?)",
-        [name, description, state],
+        "INSERT INTO project (name, description) values (?, ?)",
+        [name, description],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -104,7 +105,7 @@ app.delete("/deleteProject/:projectId", (req, res) => {
 app.get(`/project/:projectId`, (req, res) => {
     const projectId = Number(req.params.projectId);
     db.query(
-        "SELECT id, name, description FROM project WHERE id = ?",
+        "SELECT id, name, description, state FROM project WHERE id = ?",
         projectId,
         (err, result) => {
             if (err) {
@@ -152,9 +153,10 @@ app.put("/updateTask/:taskId", (req, res) => {
     const taskId = req.params.taskId;
     const name = req.body.name;
     const description = req.body.description;
+    const state = req.body.state;
     db.query(
-        "UPDATE task SET name = ?, description = ? WHERE id = ?",
-        [name, description, taskId],
+        "UPDATE task SET name = ?, description = ?, state = ? WHERE id = ?",
+        [name, description, state, taskId],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -186,7 +188,7 @@ app.delete("/deleteTask/:taskId", (req, res) => {
 
 app.get("/tasks", (req, res) => {
     db.query(
-        "SELECT p.id as projectId,  p.name as projectName, t.id as id, t.name as name, t.description as description, t.state as state, FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
+        "SELECT p.id as projectId,  p.name as projectName, t.id as id, t.name as name, t.description as description, t.state as state FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
         (err, result) => {
             if (err) {
                 console.log(err);

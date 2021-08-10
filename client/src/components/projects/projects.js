@@ -22,7 +22,7 @@ class Projects extends React.Component {
             states: [],
             showDeleteModal: false,
             projectToDelete: {}, // Modal is always "rendered", so give this an empty object instead of null to prevent errors
-            newProject: {},
+            _project: {}, // temp variable to store a copy of the project being created or updated
             editingProject: false,
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
@@ -93,7 +93,7 @@ class Projects extends React.Component {
             this.setState({
                 editingProject: true,
                 projectNameBeforeEdit: project.name,
-                newProject: project,
+                _project: project,
                 nameCharsRemaining: maxLength - project.name.length,
                 descriptionCharsRemaining: maxLength - project.description.length,
             });
@@ -105,35 +105,35 @@ class Projects extends React.Component {
             showProjectModal: false,
             editingProject: false,
             projectNameBeforeEdit: null,
-            newProject: {},
+            _project: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
     }
 
     handleNameChange(e) {
-        let newProject = { ...this.state.newProject };
-        newProject.name = e.target.value;
+        let _project = { ...this.state._project };
+        _project.name = e.target.value;
         this.setState({
-            newProject: newProject,
+            _project: _project,
             nameCharsRemaining: maxLength - e.target.value.length
         });
     }
 
     handleDescriptionChange(e) {
-        let newProject = { ...this.state.newProject };
-        newProject.description = e.target.value;
+        let _project = { ...this.state._project };
+        _project.description = e.target.value;
         this.setState({
-            newProject: newProject,
+            _project: _project,
             descriptionCharsRemaining: maxLength - e.target.value.length
         });
     }
 
     handleStateChange(e) {
-        let newProject = {...this.state.newProject};
-        newProject.state = e.target.value;
-        newProject.state_display = this.getStateDisplayValue(newProject);
-        this.setState({ newProject: newProject });
+        let _project = {...this.state._project};
+        _project.state = e.target.value;
+        _project.state_display = this.getStateDisplayValue(_project);
+        this.setState({ _project: _project });
     }
 
     getStateDisplayValue(p) {
@@ -147,30 +147,29 @@ class Projects extends React.Component {
     }
 
     handleProjectSubmit = async () => {
-        if (!this.state.newProject.name || !this.state.newProject.description) {
+        if (!this.state._project.name || !this.state._project.description) {
             alert("All fields are required");
             return;
         }
         if (this.state.editingProject) {
             let _projects = [...this.state.projects];
-            await Axios.put(`http://localhost:3001/updateProject/${this.state.newProject.id}`,
+            await Axios.put(`http://localhost:3001/updateProject/${this.state._project.id}`,
                 {
-                    name: this.state.newProject.name,
-                    description: this.state.newProject.description,
-                    state: this.state.newProject.state
+                    name: this.state._project.name,
+                    description: this.state._project.description,
+                    state: this.state._project.state
                 });
-            let _p = _projects.find(p => p.id === this.state.newProject.id);
-            _p.name = this.state.newProject.name;
-            _p.description = this.state.newProject.description;
-            _p.state = this.state.newProject.state;
-            _p.state_display = this.state.newProject.state_display;
+            let _p = _projects.find(p => p.id === this.state._project.id);
+            _p.name = this.state._project.name;
+            _p.description = this.state._project.description;
+            _p.state = this.state._project.state;
+            _p.state_display = this.state._project.state_display;
             this.setState({ projects: _projects });
         } else {
-            Axios.post("http://localhost:3001/insertProject",
+            Axios.post("http://localhost:3001/createProject",
                 {
-                    name: this.state.newProject.name,
-                    description: this.state.newProject.description,
-                    state: this.state.newProject.state
+                    name: this.state._project.name,
+                    description: this.state._project.description
                 }).then(() => {
                     this.getProjects(); // New project is being created, need to query the db after inserting to get the id in case the project needs to be edited or deleted immediately
                 });
@@ -178,7 +177,7 @@ class Projects extends React.Component {
         this.setState({
             showProjectModal: false,
             editingProject: false,
-            newProject: {},
+            _project: {},
             nameCharsRemaining: maxLength,
             descriptionCharsRemaining: maxLength
         });
@@ -186,8 +185,20 @@ class Projects extends React.Component {
 
     render() {
         var projectModalTitle;
+        var stateSelect;
         if (this.state.editingProject) {
             projectModalTitle = <div>Editing project&nbsp;<i>{this.state.projectNameBeforeEdit}</i></div>
+            stateSelect = 
+            <Form.Group>
+                <Form.Label>State</Form.Label>
+                <Form.Control className="select" as="select" value={this.state._project.state} onChange={this.handleStateChange}>
+                    {
+                        this.state.states.map((s) => {
+                            return(<option value={s.value} key={s.value}>{s.display_value}</option>)
+                        })
+                    }
+                </Form.Control>
+            </Form.Group>
         } else {
             projectModalTitle = "New project";
         }
@@ -214,24 +225,15 @@ class Projects extends React.Component {
                     <Modal.Body>
                         <Form.Group>
                             <Form.Label>Project name</Form.Label>
-                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProject.name} onChange={this.handleNameChange}></Form.Control>
+                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state._project.name} onChange={this.handleNameChange}></Form.Control>
                             <small className="text-muted">{this.state.nameCharsRemaining} characters remaining</small>
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Description</Form.Label>
-                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state.newProject.description} onChange={this.handleDescriptionChange} />
+                            <Form.Control as="textarea" maxLength={maxLength} rows={4} value={this.state._project.description} onChange={this.handleDescriptionChange} />
                             <small className="text-muted">{this.state.descriptionCharsRemaining} characters remaining</small>
                         </Form.Group>
-                        <Form.Group>
-                            <Form.Label>State</Form.Label>
-                            <Form.Control className="select" as="select" value={this.state.newProject.state} onChange={this.handleStateChange}>
-                                {
-                                    this.state.states.map((s) => {
-                                        return(<option value={s.value} key={s.value}>{s.display_value}</option>)
-                                    })
-                                }
-                            </Form.Control>
-                        </Form.Group>
+                        {stateSelect}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button className="mb-2 mr-2" variant="primary" onClick={this.handleProjectSubmit}>Submit</Button>
