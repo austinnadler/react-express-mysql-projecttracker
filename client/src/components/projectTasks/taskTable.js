@@ -31,7 +31,13 @@ class TaskTable extends React.Component {
     }
 
     componentDidMount() {
+        this.getStates();
         this.getTasks();
+    }
+
+    getStates = async () => {
+        let res = await Axios.get("http://localhost:3001/states");
+        this.setState({ states: [...res.data] });
     }
 
     getTasks() {
@@ -91,6 +97,16 @@ class TaskTable extends React.Component {
         });
     }
 
+    getStateDisplayValue(t) {
+        for(var i = 0; i < this.state.states.length; i++) {
+            var s = this.state.states[i];
+            //eslint-disable-next-line
+            if(s.value == t.state) {
+                return s.display_value;
+            }
+        }
+    }
+
     handleTaskSubmit() {
         if (!this.state.newTask.name || !this.state.newTask.description) {
             alert("All fields are required");
@@ -140,8 +156,9 @@ class TaskTable extends React.Component {
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th>State</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,6 +168,7 @@ class TaskTable extends React.Component {
                                     <tr key={t.id}>
                                         <td>{t.name}</td>
                                         <td>{t.description}</td>
+                                        <td>{t.state_display}</td>
                                         <td className="text-center">
                                             <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Edit this task</Tooltip>}>
                                                 <Button variant="primary" onClick={(e) => this.showTaskModal(t, e)}><FontAwesomeIcon icon={faEdit} /></Button>

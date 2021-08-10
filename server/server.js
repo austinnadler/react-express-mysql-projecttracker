@@ -119,7 +119,7 @@ app.get(`/project/:projectId`, (req, res) => {
 app.get(`/projectTasks/:projectId`, (req, res) => {
     const projectId = req.params.projectId;
     db.query(
-        "SELECT id, name, description FROM task WHERE projectId = ?",
+        "SELECT t.id as id, name, t.description as description, t.state as state, c.display_value as state_display FROM task t, choice c WHERE t.state = c.value AND t.projectId = ?",
         projectId,
         (err, result) => {
             if (err) {
@@ -136,7 +136,7 @@ app.post("/createTask/:projectId", (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
     db.query(
-        "INSERT INTO task (projectId, name, description) values (?, ?, ?)",
+        "INSERT INTO task (projectId, name, description, state) values (?, ?, ?, 10)",
         [projectId, name, description],
         (err, result) => {
             if (err) {
@@ -186,7 +186,7 @@ app.delete("/deleteTask/:taskId", (req, res) => {
 
 app.get("/tasks", (req, res) => {
     db.query(
-        "SELECT p.id as projectId, t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
+        "SELECT p.id as projectId,  p.name as projectName, t.id as id, t.name as name, t.description as description, t.state as state, FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
         (err, result) => {
             if (err) {
                 console.log(err);

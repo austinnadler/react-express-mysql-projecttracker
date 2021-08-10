@@ -58,12 +58,11 @@ class Projects extends React.Component {
 
     getStates = async () => {
         let res = await Axios.get("http://localhost:3001/states");
-        this.setState({ states: {...res.data} });
+        this.setState({ states: [...res.data] });
     }
 
     goTo(id, e) {
-        if (e.button === 2) return; // dont do anything on right click
-        this.props.history.push(`/tasks/${id}`);
+        if (e.button === 0) this.props.history.push(`/tasks/${id}`);
     }
 
     handleDelete(pid) {
@@ -133,7 +132,18 @@ class Projects extends React.Component {
     handleStateChange(e) {
         let newProject = {...this.state.newProject};
         newProject.state = e.target.value;
+        newProject.state_display = this.getStateDisplayValue(newProject);
         this.setState({ newProject: newProject });
+    }
+
+    getStateDisplayValue(p) {
+        for(var i = 0; i < this.state.states.length; i++) {
+            var s = this.state.states[i];
+            //eslint-disable-next-line
+            if(s.value == p.state) {
+                return s.display_value;
+            }
+        }
     }
 
     handleProjectSubmit = async () => {
@@ -153,6 +163,7 @@ class Projects extends React.Component {
             _p.name = this.state.newProject.name;
             _p.description = this.state.newProject.description;
             _p.state = this.state.newProject.state;
+            _p.state_display = this.state.newProject.state_display;
             this.setState({ projects: _projects });
         } else {
             Axios.post("http://localhost:3001/insertProject",
@@ -214,10 +225,11 @@ class Projects extends React.Component {
                         <Form.Group>
                             <Form.Label>State</Form.Label>
                             <Form.Control className="select" as="select" value={this.state.newProject.state} onChange={this.handleStateChange}>
-                                <option value="10">New</option>
-                                <option value="20">Work in Progress</option>
-                                <option value="30">On Hold</option>
-                                <option value="40">Complete</option>
+                                {
+                                    this.state.states.map((s) => {
+                                        return(<option value={s.value} key={s.value}>{s.display_value}</option>)
+                                    })
+                                }
                             </Form.Control>
                         </Form.Group>
                     </Modal.Body>
