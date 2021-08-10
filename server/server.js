@@ -20,7 +20,7 @@ app.listen(port, () => console.log("Server running on port " + port));
 
 app.get("/projects", (req, res) => {
     db.query(
-        "SELECT id, name, description, state FROM project",
+        "SELECT p.id, p.name, p.description, p.state, c.display_value as 'state_display' FROM project p, choice c WHERE p.state = c.value ORDER BY p.state, p.id;",
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -35,7 +35,7 @@ app.get("/numProjectTasks/:projectId", (req, res) => {
     const projectId = req.params.projectId;
     db.query(
         // Count the tasks whose state is not 30 (Complete)
-        "SELECT COUNT(*) as numTasks FROM task WHERE projectId = ? AND state != 30",
+        "SELECT COUNT(*) as numTasks FROM task WHERE projectId = ? AND state != 40",
         projectId,
         (err, result) => {
             if (err) {
@@ -46,12 +46,13 @@ app.get("/numProjectTasks/:projectId", (req, res) => {
         }
     );
 });
-app.post("/insertProject", (req, res) => {
+
+// mysql database defaults state to 10 (new)
+app.post("/createProject", (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
-
     db.query(
-        "INSERT INTO project (name, description, state) values (?, ?, 10)",
+        "INSERT INTO project (name, description) values (?, ?)",
         [name, description],
         (err, result) => {
             if (err) {
@@ -67,9 +68,10 @@ app.put("/updateProject/:projectId", (req, res) => {
     const projectId = Number(req.params.projectId);
     const name = req.body.name;
     const description = req.body.description;
+    const state = req.body.state;
     db.query(
-        "UPDATE project SET name = ?, description = ? WHERE id = ?",
-        [name, description, projectId],
+        "UPDATE project SET name = ?, description = ?, state = ? WHERE id = ?",
+        [name, description, state, projectId],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -103,7 +105,7 @@ app.delete("/deleteProject/:projectId", (req, res) => {
 app.get(`/project/:projectId`, (req, res) => {
     const projectId = Number(req.params.projectId);
     db.query(
-        "SELECT id, name, description FROM project WHERE id = ?",
+        "SELECT id, name, description, state FROM project WHERE id = ?",
         projectId,
         (err, result) => {
             if (err) {
@@ -118,7 +120,7 @@ app.get(`/project/:projectId`, (req, res) => {
 app.get(`/projectTasks/:projectId`, (req, res) => {
     const projectId = req.params.projectId;
     db.query(
-        "SELECT id, name, description FROM task WHERE projectId = ?",
+        "SELECT t.id as id, name, t.description as description, t.state as state, c.display_value as state_display FROM task t, choice c WHERE t.state = c.value AND t.projectId = ?",
         projectId,
         (err, result) => {
             if (err) {
@@ -135,7 +137,7 @@ app.post("/createTask/:projectId", (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
     db.query(
-        "INSERT INTO task (projectId, name, description) values (?, ?, ?)",
+        "INSERT INTO task (projectId, name, description, state) values (?, ?, ?, 10)",
         [projectId, name, description],
         (err, result) => {
             if (err) {
@@ -151,9 +153,10 @@ app.put("/updateTask/:taskId", (req, res) => {
     const taskId = req.params.taskId;
     const name = req.body.name;
     const description = req.body.description;
+    const state = req.body.state;
     db.query(
-        "UPDATE task SET name = ?, description = ? WHERE id = ?",
-        [name, description, taskId],
+        "UPDATE task SET name = ?, description = ?, state = ? WHERE id = ?",
+        [name, description, state, taskId],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -185,7 +188,7 @@ app.delete("/deleteTask/:taskId", (req, res) => {
 
 app.get("/tasks", (req, res) => {
     db.query(
-        "SELECT p.id as projectId, t.id as id, p.name as projectName, t.name as name, t.description as description FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
+        "SELECT p.id as projectId,  p.name as projectName, t.id as id, t.name as name, t.description as description, t.state as state FROM task t, project p WHERE p.id = t.projectId ORDER BY p.id, t.id",
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -202,17 +205,12 @@ app.get("/tasks", (req, res) => {
 
 app.get("/states", (req, res) => {
     db.query(
-        "SELECT value, display_value FROM choice where type = 'state'",
+        "SELECT value, display_value FROM choice WHERE type = 'state'",
         (err, result) => {
             if (err) {
                 console.log(err);
             } else {
-                //res.send(result);
-                let states = {};
-                states.new = result[0];
-                states.wip = result[1];
-                states.complete = result[2];
-                res.send(states);
+                res.send(result);
             }
         }
     );
