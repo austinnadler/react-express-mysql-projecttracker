@@ -20,11 +20,14 @@ app.listen(port, () => console.log("Server running on port " + port));
 
 app.get("/projects", (req, res) => {
     db.query(
-        "SELECT p.id, p.name, p.description, p.state, c.display_value as 'state_display' FROM project p, choice c WHERE p.state = c.value ORDER BY p.state, p.id;",
+        "SELECT p.id, p.name, p.description, p.state, c.display_value as 'state_display', p.updated FROM project p, choice c WHERE p.state = c.value ORDER BY p.state, p.updated, p.id;",
         (err, result) => {
             if (err) {
                 console.log(err);
             } else {
+                result.forEach((r) => {
+                    console.log(r);
+                });
                 res.send(result);
             }
         }
@@ -137,7 +140,7 @@ app.post("/createTask/:projectId", (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
     db.query(
-        "INSERT INTO task (projectId, name, description, state) values (?, ?, ?, 10)",
+        "INSERT INTO task (projectId, name, description) values (?, ?, ?)",
         [projectId, name, description],
         (err, result) => {
             if (err) {

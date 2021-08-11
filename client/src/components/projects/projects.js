@@ -11,6 +11,7 @@ import Button from 'react-bootstrap/Button';
 import { faTrash, faPlusSquare, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Axios from 'axios';
+import TimeStamp from '../timestamp/timestamp';
 
 const maxLength = 200;
 
@@ -40,7 +41,7 @@ class Projects extends React.Component {
     componentDidMount() {
         document.title = "Projects";
         this.getStates();
-        this.getProjects();        
+        this.getProjects();
     }
 
     getProjects() {
@@ -130,17 +131,17 @@ class Projects extends React.Component {
     }
 
     handleStateChange(e) {
-        let _project = {...this.state._project};
+        let _project = { ...this.state._project };
         _project.state = e.target.value;
         _project.state_display = this.getStateDisplayValue(_project);
         this.setState({ _project: _project });
     }
 
     getStateDisplayValue(p) {
-        for(var i = 0; i < this.state.states.length; i++) {
+        for (var i = 0; i < this.state.states.length; i++) {
             var s = this.state.states[i];
             //eslint-disable-next-line
-            if(s.value == p.state) {
+            if (s.value == p.state) {
                 return s.display_value;
             }
         }
@@ -165,6 +166,7 @@ class Projects extends React.Component {
             _p.state = this.state._project.state;
             _p.state_display = this.state._project.state_display;
             this.setState({ projects: _projects });
+            this.getProjects(); // temporary. Project currently hidden when state is changed and they should be moved to the section for their new state
         } else {
             Axios.post("http://localhost:3001/createProject",
                 {
@@ -188,17 +190,17 @@ class Projects extends React.Component {
         var stateSelect;
         if (this.state.editingProject) {
             projectModalTitle = <div>Editing project&nbsp;<i>{this.state.projectNameBeforeEdit}</i></div>
-            stateSelect = 
-            <Form.Group>
-                <Form.Label>State</Form.Label>
-                <Form.Control className="select" as="select" value={this.state._project.state} onChange={this.handleStateChange}>
-                    {
-                        this.state.states.map((s) => {
-                            return(<option value={s.value} key={s.value}>{s.display_value}</option>)
-                        })
-                    }
-                </Form.Control>
-            </Form.Group>
+            stateSelect =
+                <Form.Group>
+                    <Form.Label>State</Form.Label>
+                    <Form.Control className="select" as="select" value={this.state._project.state} onChange={this.handleStateChange}>
+                        {
+                            this.state.states.map((s) => {
+                                return (<option value={s.value} key={s.value}>{s.display_value}</option>)
+                            })
+                        }
+                    </Form.Control>
+                </Form.Group>
         } else {
             projectModalTitle = "New project";
         }
@@ -208,7 +210,10 @@ class Projects extends React.Component {
                     <Modal.Header>
                         <Modal.Title>Delete {this.state.projectToDelete.name}?</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Are you sure you want to delete {this.state.projectToDelete.name}?<br />Doing so will also delete all of its tasks.</Modal.Body>
+                    <Modal.Body>
+                        <p>Are you sure you want to delete {this.state.projectToDelete.name}?</p>
+                        <p>Doing so will also delete all of its tasks.</p>
+                    </Modal.Body>
                     <Modal.Footer>
                         <Button variant="danger" onClick={() => this.handleDelete(this.state.projectToDelete.id)}>
                             Delete
@@ -248,6 +253,57 @@ class Projects extends React.Component {
                 </Col>
                 <Row>
                     {
+                        this.state.states.map((s) => {
+                            var stateHeader = <h1 key={s.value}>{s.display_value}</h1>;
+                            var projectsInState = this.state.projects.filter((p) => p.state === s.value);
+                            if (projectsInState.length === 0) {
+                                stateHeader =
+                                    <div key={s.value}>
+                                        <h1>{s.display_value}</h1>
+                                        <p>There are currently no {s.display_value} projects.</p>
+                                    </div>;
+                            }
+                            return (
+                                <Col xs={12} className="mb-4">
+                                    {stateHeader}
+                                    <Row>
+                                        {
+                                            projectsInState.map((project) => {
+                                                return (
+                                                    <Col key={project.id} md={4} className="p-1" onMouseDown={(e) => this.goTo(project.id, e)}>
+                                                        <div className="inner shadow p-3">
+                                                            <Row>
+                                                                <Col xs={10}>
+                                                                    <h4 className="d-inline-block mb-0">{project.name}</h4>
+                                                                </Col>
+                                                                <Col xs={1}>
+                                                                    <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Edit this project</Tooltip>}>
+                                                                        <Button size="sm" variant="primary" className="float-right" onMouseDown={(e) => this.showProjectModal(project, e)}><FontAwesomeIcon icon={faEdit} /></Button>
+                                                                    </OverlayTrigger>
+                                                                </Col>
+                                                                <Col xs={1}>
+                                                                    <OverlayTrigger placement="top" delay={{ hide: 100 }} overlay={<Tooltip>Delete this project</Tooltip>}>
+                                                                        <Button size="sm" variant="danger" className="float-right" onMouseDown={(e) => this.handleDeleteConfirm(project, e)}><FontAwesomeIcon icon={faTrash} /></Button>
+                                                                    </OverlayTrigger>
+                                                                </Col>
+                                                                <Col xs={12}>
+                                                                    <small className="text-muted">
+                                                                        {project.state_display} - {project.numTasks} tasks
+                                                                    </small>
+                                                                </Col>
+                                                            </Row>
+                                                            <div>{project.description}</div>
+                                                            <TimeStamp datetime={project.updated}></TimeStamp>
+                                                        </div>
+                                                    </Col>
+                                                )
+                                            })
+                                        }
+                                    </Row>
+                                </Col>)
+                        })
+                    }
+                    {/* {
                         this.state.projects.map((p) => {
                             return (
                                 <Col key={p.id} md={4} className="p-1" onMouseDown={(e) => this.goTo(p.id, e)}>
@@ -277,7 +333,7 @@ class Projects extends React.Component {
                                 </Col>
                             )
                         })
-                    }
+                    } */}
                 </Row>
             </Container>
         )
