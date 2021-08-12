@@ -254,17 +254,17 @@ class Projects extends React.Component {
                 <Row>
                     {
                         this.state.states.map((s) => {
-                            var stateHeader = <h1 key={s.value}>{s.display_value}</h1>;
+                            var stateHeader = <h1>{s.display_value}</h1>;
                             var projectsInState = this.state.projects.filter((p) => p.state === s.value);
                             if (projectsInState.length === 0) {
                                 stateHeader =
-                                    <div key={s.value}>
+                                    <div>
                                         <h1>{s.display_value}</h1>
                                         <p>There are currently no {s.display_value} projects.</p>
                                     </div>;
                             }
                             return (
-                                <Col xs={12} className="mb-4">
+                                <Col xs={12} className="mb-4" key={s.value}>
                                     {stateHeader}
                                     <Row>
                                         {
