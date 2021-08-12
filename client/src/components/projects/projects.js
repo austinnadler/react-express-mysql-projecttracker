@@ -269,9 +269,15 @@ class Projects extends React.Component {
                                     <Row>
                                         {
                                             projectsInState.map((project) => {
+                                                let timestamp;
+                                                if(!project.updated) {
+                                                    timestamp = <TimeStamp datetime={project.created} prefix="Created"></TimeStamp>
+                                                } else {
+                                                    timestamp = <TimeStamp datetime={project.updated} prefix="Updated"></TimeStamp>
+                                                }
                                                 return (
                                                     <Col key={project.id} md={4} className="p-1" onMouseDown={(e) => this.goTo(project.id, e)}>
-                                                        <div className="inner shadow p-3">
+                                                        <div className="inner shadow p-3 position-relative">
                                                             <Row>
                                                                 <Col xs={10}>
                                                                     <h4 className="d-inline-block mb-0">{project.name}</h4>
@@ -293,7 +299,7 @@ class Projects extends React.Component {
                                                                 </Col>
                                                             </Row>
                                                             <div>{project.description}</div>
-                                                            <TimeStamp datetime={project.updated}></TimeStamp>
+                                                            <div className="position-absolute bottom-0 end-0 ts">{timestamp}</div>
                                                         </div>
                                                     </Col>
                                                 )
