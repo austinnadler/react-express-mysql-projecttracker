@@ -25,9 +25,6 @@ app.get("/projects", (req, res) => {
             if (err) {
                 console.log(err);
             } else {
-                result.forEach((r) => {
-                    console.log(r);
-                });
                 res.send(result);
             }
         }
