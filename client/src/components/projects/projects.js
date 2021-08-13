@@ -292,7 +292,7 @@ class Projects extends React.Component {
                                                                     </small>
                                                                 </Col>
                                                             </Row>
-                                                            <p>{project.description}</p>
+                                                            <div className="pb-2">{project.description}</div>
                                                             <div className="position-absolute bottom-0 end-0 p-1 ts">
                                                                 <TimeStamp created={project.created} updated={project.updated}></TimeStamp>
                                                             </div>
