@@ -138,8 +138,8 @@ class Projects extends React.Component {
     }
 
     getStateDisplayValue(p) {
-        for (var i = 0; i < this.state.states.length; i++) {
-            var s = this.state.states[i];
+        for (let i = 0; i < this.state.states.length; i++) {
+            let s = this.state.states[i];
             //eslint-disable-next-line
             if (s.value == p.state) {
                 return s.display_value;
@@ -186,8 +186,8 @@ class Projects extends React.Component {
     }
 
     render() {
-        var projectModalTitle;
-        var stateSelect;
+        let projectModalTitle;
+        let stateSelect;
         if (this.state.editingProject) {
             projectModalTitle = <div>Editing project&nbsp;<i>{this.state.projectNameBeforeEdit}</i></div>
             stateSelect =
@@ -254,8 +254,8 @@ class Projects extends React.Component {
                 <Row>
                     {
                         this.state.states.map((s) => {
-                            var stateHeader = <h1>{s.display_value}</h1>;
-                            var projectsInState = this.state.projects.filter((p) => p.state === s.value);
+                            let stateHeader = <h1>{s.display_value}</h1>;
+                            let projectsInState = this.state.projects.filter((p) => p.state === s.value);
                             if (projectsInState.length === 0) {
                                 stateHeader =
                                     <div>
@@ -292,7 +292,7 @@ class Projects extends React.Component {
                                                                     </small>
                                                                 </Col>
                                                             </Row>
-                                                            <div>{project.description}</div>
+                                                            <p>{project.description}</p>
                                                             <div className="position-absolute bottom-0 end-0 p-1 ts">
                                                                 <TimeStamp created={project.created} updated={project.updated}></TimeStamp>
                                                             </div>

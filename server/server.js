@@ -20,7 +20,7 @@ app.listen(port, () => console.log("Server running on port " + port));
 
 app.get("/projects", (req, res) => {
     db.query(
-        "SELECT p.id, p.name, p.description, p.state, c.display_value as 'state_display', p.updated as 'updated', p.created as 'created' FROM project p, choice c WHERE p.state = c.value ORDER BY p.state, p.updated, p.id;",
+        "SELECT p.id, p.name, p.description, p.state, c.display_value as 'state_display', p.updated as 'updated', p.created as 'created' FROM project p, choice c WHERE p.state = c.value ORDER BY p.state, p.updated DESC;",
         (err, result) => {
             if (err) {
                 console.log(err);
