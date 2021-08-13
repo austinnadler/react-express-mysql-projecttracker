@@ -12,7 +12,7 @@ function TimeStamp(props) {
         datetime = new Date(props.created);
     }
 
-    function getString() {
+    function getDiff() {
         let rawDiff = Math.abs(current - datetime); // milliseconds
         let diffMin = conditionalRound(rawDiff / (1000 * 60), .5); // minutes
         let diffHr = conditionalRound(rawDiff / (1000 * 60 * 60), .899); // hours
@@ -55,7 +55,7 @@ function TimeStamp(props) {
             return Math.floor(n);
         }
     }
-    return <div className="text-muted">{prefix} {getString()}</div>
+    return <div className="text-muted">{prefix} {getDiff()}</div>
 }
 
 export default TimeStamp;
