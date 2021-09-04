@@ -288,7 +288,7 @@ class Projects extends React.Component {
                                                                 </Col>
                                                                 <Col xs={12}>
                                                                     <small className="text-muted">
-                                                                        {project.state_display} - {project.numTasks} tasks
+                                                                        {project.state_display} - {project.numTasks} active tasks
                                                                     </small>
                                                                 </Col>
                                                             </Row>
